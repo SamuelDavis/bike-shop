@@ -483,16 +483,20 @@
                 return {config, isAuthed}
             },
             created() {
-                if (this.config.api_key) {
+                if (this.config.apiKey) {
                     this.authDataStore()
                         .then(() => this.importDataStore())
+                        .catch((error) => {
+                            flash.danger(error.message)
+                            console.error(error)
+                        })
                 }
             },
             computed: {
                 authInputs() {
                     return [
-                        new Input(String, "client_id", "Client Id", this.config.client_id, true),
-                        new Input(String, "api_key", "API Key", this.config.api_key, true),
+                        new Input(String, "clientId", "Client Id", this.config.clientId, true),
+                        new Input(String, "apiKey", "API Key", this.config.apiKey, true),
                         new Input(String, "spreadsheetId", "Spreadsheet Id", this.config.spreadsheetId, false)
                     ]
                 }
@@ -525,11 +529,12 @@
                                 .then(() => {
                                     gapi.auth2.getAuthInstance().isSignedIn.listen(this.onAuth)
                                     this.onAuth(gapi.auth2.getAuthInstance().isSignedIn.get())
+                                    if (!this.isAuthed) this.signin()
                                     resolve()
                                 }, (error) => {
                                     console.error(error.details)
                                     flash.danger(error.details)
-                                    reject()
+                                    reject(error)
                                 })
                         })
                     })
@@ -643,7 +648,7 @@
                 return {
                     routes,
                     activePath: window.location.hash || routes[0].path,
-                    searchTerm: "Foo"
+                    searchTerm: ""
                 }
             },
             computed: {
