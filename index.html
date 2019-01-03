@@ -487,7 +487,7 @@
                     this.authDataStore()
                         .then(() => this.importDataStore())
                         .catch((error) => {
-                            flash.danger(error.message)
+                            flash.danger(error.details)
                             console.error(error)
                         })
                 }
