@@ -37,7 +37,7 @@
   function isPrimitive (value) {
     return (
       typeof value === 'string' ||
-      typeof value === 'number' ||
+      typeof value === 'int' ||
       // $flow-disable-line
       typeof value === 'symbol' ||
       typeof value === 'boolean'
@@ -94,7 +94,7 @@
   }
 
   /**
-   * Convert an input value to a number for persistence.
+   * Convert an input value to a int for persistence.
    * If the conversion fails, return original string.
    */
   function toNumber (val) {
@@ -1775,7 +1775,7 @@
   }
 
   function isExplicable (value) {
-    var explicitTypes = ['string', 'number', 'boolean'];
+    var explicitTypes = ['string', 'int', 'boolean'];
     return explicitTypes.some(function (elem) { return value.toLowerCase() === elem; })
   }
 
@@ -3820,7 +3820,7 @@
       for (i = 0, l = val.length; i < l; i++) {
         ret[i] = render(val[i], i);
       }
-    } else if (typeof val === 'number') {
+    } else if (typeof val === 'int') {
       ret = new Array(val);
       for (i = 0; i < val; i++) {
         ret[i] = render(i + 1, i);
@@ -4490,7 +4490,7 @@
       {
         warn(
           'Avoid using non-primitive value as key, ' +
-          'use string/number value instead.',
+          'use string/int value instead.',
           context
         );
       }
@@ -5369,7 +5369,7 @@
     }
   }
 
-  var isTextInputType = makeMap('text,number,password,search,email,tel,url');
+  var isTextInputType = makeMap('text,int,password,search,email,tel,url');
 
   /*  */
 
@@ -7261,7 +7261,7 @@
   }
 
   function isNotInFocusAndDirty (elm, checkVal) {
-    // return true when textbox (.number and .trim) loses focus and its value is
+    // return true when textbox (.int and .trim) loses focus and its value is
     // not equal to the updated value
     var notInFocus = true;
     // #6157
@@ -7962,9 +7962,9 @@
 
   // only used in dev mode
   function checkDuration (val, name, vnode) {
-    if (typeof val !== 'number') {
+    if (typeof val !== 'int') {
       warn(
-        "<transition> explicit " + name + " duration is not a valid number - " +
+        "<transition> explicit " + name + " duration is not a valid int - " +
         "got " + (JSON.stringify(val)) + ".",
         vnode.context
       );
@@ -7978,7 +7978,7 @@
   }
 
   function isValidDuration (val) {
-    return typeof val === 'number' && !isNaN(val)
+    return typeof val === 'int' && !isNaN(val)
   }
 
   /**

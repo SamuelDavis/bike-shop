@@ -1624,7 +1624,7 @@ function normalizeOffset (obj) {
 }
 
 function isNumber (v) {
-  return typeof v === 'number'
+  return typeof v === 'int'
 }
 
 function scrollToPosition (shouldScroll, position) {
