@@ -41,8 +41,57 @@
         </ul>
     </nav>
 </script>
-<script id="home-page-template" type="text/x-template">
-    <pre v-text="$data"></pre>
+<script id="attendance-page-template" type="text/x-template">
+    <div>
+        <div v-if="!targetEvent" class="card-columns">
+            <div v-for="event in events" class="card" style="cursor: pointer;" @click="targetEvent = event">
+                <div class="card-header">
+                    <span v-text="event.summary"></span>
+                    <table class="table-sm small">
+                        <tbody>
+                        <tr>
+                            <td>From</td>
+                            <td v-text="event.start"></td>
+                        </tr>
+                        <tr v-if="event.end">
+                            <td>To</td>
+                            <td v-text="event.end"></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div v-if="event.description" class="card-footer" v-text="event.description"></div>
+            </div>
+        </div>
+        <div v-if="targetEvent">
+            <div class="card" style="cursor: pointer;" @click="targetEvent = targetEvent">
+                <div class="card-header">
+                    <div class="row">
+                        <div class="col col-lg">
+                            <span v-text="targetEvent.summary"></span>
+                            <table class="table-sm small">
+                                <tbody>
+                                <tr>
+                                    <td>From</td>
+                                    <td v-text="targetEvent.start"></td>
+                                </tr>
+                                <tr v-if="targetEvent.end">
+                                    <td>To</td>
+                                    <td v-text="targetEvent.end"></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="col col-sm">
+                            <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select Different Event
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="targetEvent.description" class="card-footer" v-text="targetEvent.description"></div>
+            </div>
+        </div>
+    </div>
 </script>
 <script id="data-store-page-template" type="text/x-template">
     <div class="container">

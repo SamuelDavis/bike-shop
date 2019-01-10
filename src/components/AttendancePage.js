@@ -1,10 +1,11 @@
 import * as Google from "../util/google.js"
 
 export default {
-    template: "#home-page-template",
+    template: "#attendance-page-template",
     data() {
         return {
-            events: undefined
+            events: undefined,
+            targetEvent: undefined
         }
     },
     methods: {
