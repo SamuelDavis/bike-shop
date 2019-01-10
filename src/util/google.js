@@ -1,4 +1,10 @@
 import {promisify} from "./promise.js"
+import Event from "../models/Event.js"
+import {proxy} from "./proxy.js"
+
+function getClient() {
+    return proxy(gapi.client)
+}
 
 function loadLibrary(library = "client:auth2") {
     return new Promise((resolve, reject) => {
@@ -11,7 +17,7 @@ function loadLibrary(library = "client:auth2") {
 }
 
 function setConfig(config) {
-    const request = gapi.client.init(config)
+    const request = getClient().init(config)
     return promisify(request.then.bind(request))
 }
 
@@ -37,7 +43,7 @@ export function signout() {
 }
 
 export function createDataStore(title, namespaces = []) {
-    const request = gapi.client.sheets.spreadsheets.create({}, {
+    const request = getClient().sheets.spreadsheets.create({}, {
         properties: {title},
         sheets: namespaces.map((namespace) => {
             return {properties: {title: namespace}}
@@ -53,7 +59,7 @@ export function clearDataStore(spreadsheetId, namespaces = []) {
             range: namespace
         }
         const clearValuesRequestBody = {}
-        const request = gapi.client.sheets.spreadsheets.values.clear(params, clearValuesRequestBody)
+        const request = getClient().sheets.spreadsheets.values.clear(params, clearValuesRequestBody)
         return promisify(request.then.bind(request))
     })
 
@@ -67,16 +73,16 @@ export function exportDataStore(spreadsheetId, state) {
         return {range, values}
     })
     const body = {data, valueInputOption: "USER_ENTERED"}
-    const request = gapi.client.sheets.spreadsheets.values.batchUpdate({
+    const request = getClient().sheets.spreadsheets.values.batchUpdate({
         spreadsheetId: this.config.spreadsheetId,
         resource: body
     })
     return promisify(request.then.bind(request))
 }
 
-export function importDataStore() {
+export function fetchDataStore() {
     const ranges = Object.keys(this.$store.state)
-    const request = gapi.client.sheets.spreadsheets.values.batchGet({
+    const request = getClient().sheets.spreadsheets.values.batchGet({
         spreadsheetId: this.config.spreadsheetId,
         ranges
     })
@@ -88,4 +94,21 @@ export function importDataStore() {
                 return {...acc, [namespace]: records}
             }, {})
         })
+}
+
+export function fetchCalendarEvents(calendarId = "primary", from = new Date()) {
+    const request = getClient().calendar.events.list({
+        calendarId: calendarId,
+        timeMin: from.toISOString()
+    })
+
+    return promisify(request.then.bind(request))
+        .then((res) => res.result.items.map((raw) => {
+            const [start, end] = [raw.start, raw.end].map((val) => val ? val.dateTime || val.date : undefined)
+            return new Event({
+                ...raw,
+                start: start && new Date(start) || undefined,
+                end: end && new Date(end) || undefined
+            })
+        }))
 }

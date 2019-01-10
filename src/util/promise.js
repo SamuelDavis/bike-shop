@@ -1,3 +1,5 @@
 export function promisify(cb) {
-    return new Promise((res, rej) => cb(res, rej))
+    return new Promise((res) => {
+        return cb(res)
+    })
 }

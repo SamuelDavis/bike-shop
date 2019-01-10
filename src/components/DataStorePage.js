@@ -4,7 +4,7 @@ import GenericForm from "./GenForm.js"
 import FormInput from "../models/FormInput.js"
 
 export default {
-    template: "#data-store-template",
+    template: "#data-store-page-template",
     components: {
         "gen-form": GenericForm
     },
@@ -17,8 +17,14 @@ export default {
                 spreadsheetId: ""
             },
             config: {
-                discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                scope: "https://www.googleapis.com/auth/spreadsheets"
+                discoveryDocs: [
+                    "https://sheets.googleapis.com/$discovery/rest?version=v4",
+                    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+                ],
+                scope: [
+                    "https://www.googleapis.com/auth/spreadsheets",
+                    "https://www.googleapis.com/auth/calendar.readonly"
+                ].join(" ")
             }
         }
     },
@@ -40,6 +46,12 @@ export default {
         },
         updateAuth(data) {
             this.auth = data
+        },
+        signIn(e) {
+            Google.signin()
+        },
+        signOut(e) {
+            Google.signout()
         }
     },
     watch: {

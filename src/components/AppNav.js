@@ -10,8 +10,11 @@ export default {
         }
     },
     computed: {
+        home() {
+            return this.$router.options.routes[0]
+        },
         routes() {
-            return this.$router.options.routes
+            return this.$router.options.routes.slice(1)
         }
     }
 }

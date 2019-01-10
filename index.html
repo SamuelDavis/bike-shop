@@ -25,12 +25,14 @@
 <script id="app-template" type="text/x-template">
     <div>
         <app-nav class="mb-3 navbar-light bg-light"/>
-        <router-view></router-view>
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </script>
 <script id="app-nav-template" type="text/x-template">
     <nav class="navbar navbar-expand">
-        <router-link to="/" class="navbar-brand" v-text="brand"></router-link>
+        <router-link :to="home.path" class="navbar-brand" v-text="home.label"></router-link>
         <ul class="navbar-nav mr-auto">
             <router-link v-for="route, i in routes" :key="route.path" :to="route.path" tag="li" class="nav-item"
                          active-class="active">
@@ -39,12 +41,16 @@
         </ul>
     </nav>
 </script>
-<script id="data-store-template" type="text/x-template">
+<script id="home-page-template" type="text/x-template">
+    <pre v-text="$data"></pre>
+</script>
+<script id="data-store-page-template" type="text/x-template">
     <div class="container">
-        <button v-if="isAuthed" class="btn btn-danger">Sign Out</button>
-        <button v-else class="btn btn-success">Sign In</button>
+        <button v-if="isAuthed" class="btn btn-danger" @click="signOut">Sign Out</button>
+        <button v-else class="btn btn-success" @click="signIn">Sign In</button>
         <a v-if="isAuthed && auth.spreadsheetId" class="btn btn-primary"
-           :href="`https://docs.google.com/spreadsheets/d/${auth.spreadsheetId}`" target="_blank">Open Spreadsheet</a>
+           :href="`https://docs.google.com/spreadsheets/d/${auth.spreadsheetId}`" target="_blank">Open
+            Spreadsheet</a>
         <hr>
         <gen-form :inputs="formInputs" :onSubmit="updateAuth"/>
     </div>
