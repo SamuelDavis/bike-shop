@@ -15,15 +15,21 @@
 <script src="vendor/vuex.js" type="application/javascript"></script>
 <script src="vendor/vue-router.js" type="application/javascript"></script>
 <script src="vendor/client.js" type="application/javascript"></script>
-<script src="src/index.js" type="module"></script>
+<script type="module">
+    import errorHandler from "./src/util/errorHandler.js"
+    import main from "./src/index.js"
+
+    addEventListener("error", errorHandler)
+    document.addEventListener("DOMContentLoaded", main)
+</script>
 <script id="app-template" type="text/x-template">
     <div>
-        <app-nav/>
+        <app-nav class="mb-3 navbar-light bg-light"/>
         <router-view></router-view>
     </div>
 </script>
 <script id="app-nav-template" type="text/x-template">
-    <nav class="navbar navbar-expand navbar-light bg-light">
+    <nav class="navbar navbar-expand">
         <router-link to="/" class="navbar-brand" v-text="brand"></router-link>
         <ul class="navbar-nav mr-auto">
             <router-link v-for="route, i in routes" :key="route.path" :to="route.path" tag="li" class="nav-item"
@@ -34,9 +40,13 @@
     </nav>
 </script>
 <script id="data-store-template" type="text/x-template">
-    <div>
+    <div class="container">
+        <button v-if="isAuthed" class="btn btn-danger">Sign Out</button>
+        <button v-else class="btn btn-success">Sign In</button>
+        <a v-if="isAuthed && auth.spreadsheetId" class="btn btn-primary"
+           :href="`https://docs.google.com/spreadsheets/d/${auth.spreadsheetId}`" target="_blank">Open Spreadsheet</a>
+        <hr>
         <gen-form :inputs="formInputs" :onSubmit="updateAuth"/>
-        <pre v-text="formInputs"></pre>
     </div>
 </script>
 <script id="gen-form-template" type="text/x-template">

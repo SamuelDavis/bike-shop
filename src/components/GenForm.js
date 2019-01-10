@@ -1,4 +1,4 @@
-import {extractForm} from "./../util/form.js"
+import {extractForm} from "../util/form.js"
 import FormControl from "./FormControl.js"
 
 export default {

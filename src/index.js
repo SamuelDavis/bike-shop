@@ -1,7 +1,7 @@
 import AppNav from "./components/AppNav.js"
 import router from "./router.js"
 
-document.addEventListener("DOMContentLoaded", () => {
+export default function () {
     new Vue({
         el: "#app",
         template: "#app-template",
@@ -10,4 +10,4 @@ document.addEventListener("DOMContentLoaded", () => {
             "app-nav": AppNav
         }
     })
-})
+}

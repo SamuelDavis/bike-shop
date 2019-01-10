@@ -1,3 +1,4 @@
+import * as Google from "../util/google.js"
 import {parseQuery} from "../util/str.js"
 import GenericForm from "./GenForm.js"
 import FormInput from "../models/FormInput.js"
@@ -9,12 +10,15 @@ export default {
     },
     data() {
         return {
+            isAuthed: false,
             auth: {
+                clientId: "",
+                apiKey: "",
+                spreadsheetId: ""
+            },
+            config: {
                 discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                scope: "https://www.googleapis.com/auth/spreadsheets",
-                clientId: undefined,
-                apiKey: undefined,
-                spreadsheetId: undefined
+                scope: "https://www.googleapis.com/auth/spreadsheets"
             }
         }
     },
@@ -35,22 +39,36 @@ export default {
             localStorage.setItem("auth", JSON.stringify(auth))
         },
         updateAuth(data) {
-            this.auth = {...this.auth, ...data}
+            this.auth = data
         }
     },
     watch: {
         auth: {
             handler(auth) {
                 this.saveAuth(auth)
-            },
-            deep: true
+                Google
+                    .authDataStore({...this.config, ...this.auth})
+                    .then(() => {
+                        Google.setSignInListener((isAuthed) => this.isAuthed = isAuthed)
+                        this.isAuthed = Google.getAuthStatus()
+                        if (!this.isAuthed) Google.signin()
+                    })
+            }
+        },
+        isAuthed(isAuthed) {
+            if (isAuthed && !this.auth.spreadsheetId) {
+                Google
+                    .createDataStore("test", ["foo", "bar", "qux"])
+                    .then((res) => this.updateAuth({...this.auth, spreadsheetId: res.result.spreadsheetId}))
+            }
         }
     },
     created() {
         const query = parseQuery()
         const storage = this.loadAuth()
-        Object
+        const data = Object
             .keys(this.auth)
-            .forEach((key) => Vue.set(this.auth, key, storage[key] || query[key]))
+            .reduce((acc, key) => ({...acc, [key]: storage[key] || query[key] || acc[key]}), this.auth)
+        this.updateAuth(data)
     }
 }

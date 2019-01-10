@@ -1,4 +1,4 @@
-import * as Faker from "./../util/faker.js"
+import * as Faker from "../util/faker.js"
 
 export default class FormInput {
     constructor(name, label, value = undefined, required = false) {
