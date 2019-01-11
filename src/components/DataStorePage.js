@@ -2,21 +2,17 @@ import * as Google from "../util/google.js"
 import {parseQuery} from "../util/str.js"
 import GenericForm from "./GenForm.js"
 import FormInput from "../models/FormInput.js"
+import store, {mutations} from "../store.js"
 
 export default {
     template: "#data-store-page-template",
     components: {
         "gen-form": GenericForm
     },
+    store,
     data() {
         return {
             isAuthed: false,
-            auth: {
-                clientId: "",
-                apiKey: "",
-                spreadsheetId: "",
-                calendarId: ""
-            },
             config: {
                 discoveryDocs: [
                     "https://sheets.googleapis.com/$discovery/rest?version=v4",
@@ -30,6 +26,14 @@ export default {
         }
     },
     computed: {
+        auth: {
+            get() {
+                return this.$store.state.auth
+            },
+            set(auth) {
+                this.$store.commit(mutations.updateAuth.name, auth)
+            }
+        },
         formInputs() {
             return [
                 new FormInput("clientId", "Google Client ID", this.auth.clientId, true),

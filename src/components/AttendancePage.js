@@ -1,7 +1,9 @@
 import * as Google from "../util/google.js"
+import store from "../store.js"
 
 export default {
     template: "#attendance-page-template",
+    store,
     data() {
         return {
             events: undefined,
@@ -11,7 +13,7 @@ export default {
     methods: {
         loadEvents() {
             if (!this.events)
-                Google.fetchCalendarEvents("hva040762hhngg3nerqnfc5n2s@group.calendar.google.com")
+                Google.fetchCalendarEvents(this.$store.state.auth.calendarId)
                     .then((eventList) => this.events = eventList)
         }
     },
