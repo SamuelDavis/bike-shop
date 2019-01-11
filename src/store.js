@@ -1,5 +1,6 @@
-import * as Google from "./util/google.js"
+import * as google from "./util/google.js"
 import User from "./data/User.js"
+import * as flash from "./util/flash.js"
 
 export const namespaces = ["meta", User.name]
 
@@ -69,9 +70,10 @@ store.watch(function (state) {
     return state.data
 }, function () {
     if (store.state.isAuthed)
-        Google
+        google
             .clearDataStore(store.state.auth.spreadsheetId, namespaces)
-            .then(() => Google.exportDataStore(store.state.auth.spreadsheetId, store.getters.exportData))
+            .then(() => google.exportDataStore(store.state.auth.spreadsheetId, store.getters.exportData))
+            .then(() => flash.success("Saved."))
 }, {deep: true})
 
 export default store
