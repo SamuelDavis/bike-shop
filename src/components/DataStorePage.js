@@ -2,7 +2,7 @@ import * as Google from "../util/google.js"
 import {parseQuery} from "../util/str.js"
 import GenericForm from "./GenForm.js"
 import FormInput from "../models/FormInput.js"
-import store, {mutations} from "../store.js"
+import store, {mutations, namespaces} from "../store.js"
 
 export default {
     template: "#data-store-page-template",
@@ -12,7 +12,6 @@ export default {
     store,
     data() {
         return {
-            isAuthed: false,
             config: {
                 discoveryDocs: [
                     "https://sheets.googleapis.com/$discovery/rest?version=v4",
@@ -32,6 +31,14 @@ export default {
             },
             set(auth) {
                 this.$store.commit(mutations.updateAuth.name, auth)
+            }
+        },
+        isAuthed: {
+            get() {
+                return this.$store.state.isAuthed
+            },
+            set(isAuthed) {
+                this.$store.commit(mutations.setAuth.name, isAuthed)
             }
         },
         formInputs() {
@@ -76,7 +83,7 @@ export default {
         isAuthed(isAuthed) {
             if (isAuthed && !this.auth.spreadsheetId) {
                 Google
-                    .createDataStore("test", ["foo", "bar", "qux"])
+                    .createDataStore("NCCDB", namespaces)
                     .then((res) => this.updateAuth({...this.auth, spreadsheetId: res.result.spreadsheetId}))
             }
         }

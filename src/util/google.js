@@ -74,7 +74,7 @@ export function exportDataStore(spreadsheetId, state) {
     })
     const body = {data, valueInputOption: "USER_ENTERED"}
     const request = getClient().sheets.spreadsheets.values.batchUpdate({
-        spreadsheetId: this.config.spreadsheetId,
+        spreadsheetId,
         resource: body
     })
     return promisify(request.then.bind(request))
