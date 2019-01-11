@@ -14,7 +14,8 @@ export default {
             auth: {
                 clientId: "",
                 apiKey: "",
-                spreadsheetId: ""
+                spreadsheetId: "",
+                calendarId: ""
             },
             config: {
                 discoveryDocs: [
@@ -33,7 +34,8 @@ export default {
             return [
                 new FormInput("clientId", "Google Client ID", this.auth.clientId, true),
                 new FormInput("apiKey", "Google API Key", this.auth.apiKey, true),
-                new FormInput("spreadsheetId", "Spreadsheet ID", this.auth.spreadsheetId)
+                new FormInput("spreadsheetId", "Spreadsheet ID", this.auth.spreadsheetId),
+                new FormInput("calendarId", "Calendar ID", this.auth.calendarId)
             ]
         }
     },

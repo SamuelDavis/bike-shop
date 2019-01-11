@@ -42,11 +42,13 @@
     </nav>
 </script>
 <script id="attendance-page-template" type="text/x-template">
-    <div>
+    <div class="container">
         <div v-if="!targetEvent" class="card-columns">
             <div v-for="event in events" class="card" style="cursor: pointer;" @click="targetEvent = event">
-                <div class="card-header">
-                    <span v-text="event.summary"></span>
+                <div class="card-body">
+                    <p class="card-title" v-text="event.summary"></p>
+                    <p v-if="event.description" class="card-text" v-text="event.description"></p>
+                    <p class="card-text" v-if="event.location" v-text="event.location"></p>
                     <table class="table-sm small">
                         <tbody>
                         <tr>
@@ -60,15 +62,16 @@
                         </tbody>
                     </table>
                 </div>
-                <div v-if="event.description" class="card-footer" v-text="event.description"></div>
             </div>
         </div>
         <div v-if="targetEvent">
-            <div class="card" style="cursor: pointer;" @click="targetEvent = targetEvent">
-                <div class="card-header">
-                    <div class="row">
-                        <div class="col col-lg">
-                            <span v-text="targetEvent.summary"></span>
+            <div class="card">
+                <div class="row">
+                    <div class="col col-lg">
+                        <div class="card-body">
+                            <p class="card-title" v-text="targetEvent.summary"></p>
+                            <p v-if="targetEvent.description" class="card-text" v-text="targetEvent.description"></p>
+                            <p class="card-text" v-if="targetEvent.location" v-text="targetEvent.location"></p>
                             <table class="table-sm small">
                                 <tbody>
                                 <tr>
@@ -82,13 +85,13 @@
                                 </tbody>
                             </table>
                         </div>
-                        <div class="col col-sm">
-                            <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select Different Event
-                            </button>
-                        </div>
+                    </div>
+                    <div class="col col-sm">
+                        <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select
+                            Different Event
+                        </button>
                     </div>
                 </div>
-                <div v-if="targetEvent.description" class="card-footer" v-text="targetEvent.description"></div>
             </div>
         </div>
     </div>

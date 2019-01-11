@@ -11,7 +11,7 @@ export default {
     methods: {
         loadEvents() {
             if (!this.events)
-                Google.fetchCalendarEvents()
+                Google.fetchCalendarEvents("hva040762hhngg3nerqnfc5n2s@group.calendar.google.com")
                     .then((eventList) => this.events = eventList)
         }
     },
