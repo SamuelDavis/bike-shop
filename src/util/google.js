@@ -2,6 +2,11 @@ import {promisify} from "./promise.js"
 import Event from "../models/Event.js"
 import {proxy} from "./proxy.js"
 
+
+function thenify(request) {
+    return promisify(request.then.bind(request))
+}
+
 function getClient() {
     return proxy(gapi.client)
 }
@@ -18,7 +23,7 @@ function loadLibrary(library = "client:auth2") {
 
 function setConfig(config) {
     const request = getClient().init(config)
-    return promisify(request.then.bind(request))
+    return thenify(request)
 }
 
 export function setSignInListener(cb) {
@@ -35,11 +40,13 @@ export function authDataStore(config) {
 }
 
 export function signin() {
-    return gapi.auth2.getAuthInstance().signIn()
+    const request = gapi.auth2.getAuthInstance().signIn()
+    return thenify(request)
 }
 
 export function signout() {
-    return gapi.auth2.getAuthInstance().signOut()
+    const request = gapi.auth2.getAuthInstance().signOut()
+    return thenify(request)
 }
 
 export function createDataStore(title, namespaces = []) {
@@ -49,7 +56,7 @@ export function createDataStore(title, namespaces = []) {
             return {properties: {title: namespace}}
         }, [])
     })
-    return promisify(request.then.bind(request))
+    return thenify(request)
 }
 
 export function clearDataStore(spreadsheetId, namespaces = []) {
@@ -60,7 +67,7 @@ export function clearDataStore(spreadsheetId, namespaces = []) {
         }
         const clearValuesRequestBody = {}
         const request = getClient().sheets.spreadsheets.values.clear(params, clearValuesRequestBody)
-        return promisify(request.then.bind(request))
+        return thenify(request)
     })
 
     return Promise.all(requests)
@@ -77,16 +84,19 @@ export function exportDataStore(spreadsheetId, state) {
         spreadsheetId,
         resource: body
     })
-    return promisify(request.then.bind(request))
+    return thenify(request)
 }
 
-export function fetchDataStore() {
-    const ranges = Object.keys(this.$store.state)
+export function getSpreadsheet(spreadsheetId, ranges = undefined) {
     const request = getClient().sheets.spreadsheets.values.batchGet({
-        spreadsheetId: this.config.spreadsheetId,
+        spreadsheetId,
         ranges
     })
-    return promisify(request.then.bind(request))
+    return thenify(request)
+}
+
+export function fetchDataStore(spreadsheetId, ranges) {
+    return getSpreadsheet(spreadsheetId, ranges)
         .then((response) => {
             return response.result.valueRanges.reduce((acc, valueRange) => {
                 const namespace = valueRange.range.split("!")[0]
@@ -102,7 +112,7 @@ export function fetchCalendarEvents(calendarId = "primary", from = new Date()) {
         timeMin: from.toISOString()
     })
 
-    return promisify(request.then.bind(request))
+    return thenify(request)
         .then((res) => res.result.items.map((raw) => {
             const [start, end] = [raw.start, raw.end].map((val) => val ? val.dateTime || val.date : undefined)
             return new Event({
