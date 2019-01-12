@@ -10,4 +10,13 @@ export default class Model {
             updatedAt: Date
         }
     }
+
+    fromArray(arr) {
+        Object.keys(this.properties).forEach((prop, i) => this[prop] = arr[i])
+        return this
+    }
+
+    toArray() {
+        return Object.keys(this.properties).map((prop) => this[prop])
+    }
 }

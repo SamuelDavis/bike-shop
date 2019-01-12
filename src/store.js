@@ -1,7 +1,9 @@
 import * as google from "./util/google.js"
 import {parseQuery} from "./util/str.js"
+import * as faker from "./util/faker.js"
+import Event from "./models/Event.js"
 
-export const namespaces = []
+const MODEL_MAP = [Event].reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
 
 export const mutations = {
     updateAuth(state, isAuthed) {
@@ -12,19 +14,13 @@ export const mutations = {
     },
     saveModel(state, model) {
         const namespace = model.constructor.name
-        Vue.set(state.data, namespace, state.data[namespace] || [])
+        Vue.set(state.data, namespace, state.data[namespace] || {})
 
-        if (model.id === undefined) {
-            const id = (state.idCount[namespace] || 0) + 1
-            model.id = id
-            Vue.set(state.idCount, namespace, id)
-        }
+        model.id = model.id === undefined ? faker.str() : model.id
         model.createdAt = model.createdAt || new Date()
         model.updatedAt = new Date()
 
-        const index = state.data[namespace].findIndex((item) => item.id === model.id)
-
-        Vue.set(state.data[namespace], index === -1 ? state.data[namespace].length : index, model)
+        Vue.set(state.data[namespace], model.id, model)
     },
     setSpreadsheet(state, spreadsheet) {
         state.auth.spreadsheet = spreadsheet
@@ -78,7 +74,6 @@ const state = (() => {
                 ].join(" ")
             }
         },
-        idCount: {},
         data: {}
     }
     for (let key in state.auth.creds)
@@ -93,7 +88,12 @@ const getters = {
         return {...state.auth.config, ...state.auth.creds}
     },
     lookup(state) {
-        return (namespace) => state.data[namespace] || []
+        return (namespace) => Object.values(state.data[namespace] || {})
+    },
+    existingSheets(state) {
+        return state.auth.spreadsheet
+            ? state.auth.spreadsheet.sheets.map((sheet) => sheet.properties.title)
+            : []
     }
 }
 
@@ -106,7 +106,6 @@ const store = new Vuex.Store({
 store.watch((state) => state.auth.creds, (auth) => {
     localStorage.setItem("auth", JSON.stringify(auth))
     authGoogle(store, store.getters.authConfig)
-        .catch((err) => console.error({err}))
 }, {deep: true})
 
 store.watch((state) => state.auth.active, () => {
@@ -116,8 +115,18 @@ store.watch((state) => state.auth.active, () => {
         ? google
             .getSpreadsheet(store.state.auth.creds.spreadsheetId)
             .then((res) => store.commit(mutations.setSpreadsheet.name, res.result))
+            .then(() => {
+                google
+                    .fetchSpreadsheet(store.state.auth.creds.spreadsheetId, store.getters.existingSheets)
+                    .then((data) => Object.keys(data)
+                        .filter((key) => key in MODEL_MAP)
+                        .forEach((key) => (data[key] || [])
+                            .forEach((record) => {
+                                store.commit(mutations.saveModel.name, new MODEL_MAP[key]().fromArray(record))
+                            })))
+            })
         : google
-            .createDataStore("NCCDB", [])
+            .createSpreadsheet("NCCDB", [])
             .then((res) => {
                 store.commit(mutations.updateCreds.name, {
                     ...store.state.auth.creds,
@@ -132,7 +141,15 @@ store.watch((state) => state.auth.active, () => {
         ]))
 })
 store.watch((state) => state.data, (data) => {
-    console.log("Sync")
+    if (store.state.auth.creds.spreadsheetId) {
+        const missingSheets = Object.keys(data)
+            .filter((key) => !store.getters.existingSheets.includes(key));
+
+        (missingSheets.length
+            ? google.createSheets(store.state.auth.creds.spreadsheetId, missingSheets)
+            : Promise.resolve())
+            .then(() => google.exportSpreadsheet(store.state.auth.creds.spreadsheetId, data))
+    }
 }, {deep: true})
 
 authGoogle(store, store.getters.authConfig)

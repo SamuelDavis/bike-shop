@@ -49,7 +49,7 @@ export function signout() {
     return thenify(request)
 }
 
-export function createDataStore(title, namespaces = []) {
+export function createSpreadsheet(title, namespaces = []) {
     const request = getClient().sheets.spreadsheets.create({}, {
         properties: {title},
         sheets: namespaces.map((namespace) => {
@@ -73,30 +73,45 @@ export function clearDataStore(spreadsheetId, namespaces = []) {
     return Promise.all(requests)
 }
 
-export function exportDataStore(spreadsheetId, state) {
-    const data = Object.keys(state).map((key) => {
-        const range = `${key}!A1:Z99999`
-        const values = state[key].map((record) => Object.values(record))
-        return {range, values}
-    })
-    const body = {data, valueInputOption: "USER_ENTERED"}
-    const request = getClient().sheets.spreadsheets.values.batchUpdate({
-        spreadsheetId,
-        resource: body
-    })
+export function createSheets(spreadsheetId, names) {
+    const props = {spreadsheetId}
+    const requests = names.map((name) => ({
+        addSheet: {
+            properties: {
+                title: name
+            }
+        }
+    }))
+    const body = {requests}
+    const request = getClient().sheets.spreadsheets.batchUpdate(props, body)
+    return thenify(request)
+}
+
+export function exportSpreadsheet(spreadsheetId, data) {
+    const resource = {
+        valueInputOption: "USER_ENTERED",
+        data: Object.keys(data).map((key) => ({
+            range: `${key}!A1:Z99999`,
+            values: Object.values(data[key]).map((record) => record.toArray())
+        }))
+    }
+    const request = getClient().sheets.spreadsheets.values.batchUpdate({spreadsheetId, resource})
     return thenify(request)
 }
 
 export function getSpreadsheet(spreadsheetId, ranges = undefined) {
+    const request = getClient().sheets.spreadsheets.get({
+        spreadsheetId
+    })
+    return thenify(request)
+}
+
+export function fetchSpreadsheet(spreadsheetId, ranges) {
     const request = getClient().sheets.spreadsheets.values.batchGet({
         spreadsheetId,
         ranges
     })
     return thenify(request)
-}
-
-export function fetchDataStore(spreadsheetId, ranges) {
-    return getSpreadsheet(spreadsheetId, ranges)
         .then((response) => {
             return response.result.valueRanges.reduce((acc, valueRange) => {
                 const namespace = valueRange.range.split("!")[0]
