@@ -28,60 +28,31 @@ export const mutations = {
 
 }
 
-function authGoogle(store, config) {
-    return google
-        .authDataStore(config)
-        .then(() => {
-            google.setSignInListener((isAuthed) => store.commit(mutations.updateAuth(isAuthed)))
-            store.commit(mutations.updateAuth.name, google.getAuthStatus())
-            return !store.state.auth.active ? google.signin() : Promise.resolve()
-        })
-}
-
-function importSpreadsheet(store) {
-    console.log("spreadsheet")
-    return Promise.resolve()
-}
-
-function importCalendar(store) {
-    return google
-        .fetchCalendarEvents(store.state.auth.creds.calendarId)
-        .then((events) => events.forEach((event) => store.commit(mutations.saveModel.name, event)))
-}
-
-
-const state = (() => {
-    const query = parseQuery()
-    const storage = JSON.parse(localStorage.getItem("auth") || "{}")
-    const state = {
-        auth: {
-            active: false,
-            spreadsheet: undefined,
-            creds: {
-                clientId: "",
-                apiKey: "",
-                spreadsheetId: "",
-                calendarId: ""
-            },
-            config: {
-                discoveryDocs: [
-                    "https://sheets.googleapis.com/$discovery/rest?version=v4",
-                    "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
-                ],
-                scope: [
-                    "https://www.googleapis.com/auth/spreadsheets",
-                    "https://www.googleapis.com/auth/calendar.readonly"
-                ].join(" ")
-            }
+const state = {
+    auth: {
+        active: false,
+        spreadsheet: undefined,
+        creds: {
+            clientId: "",
+            apiKey: "",
+            spreadsheetId: "",
+            calendarId: "",
+            ...parseQuery(),
+            ...JSON.parse(localStorage.getItem("auth") || "{}")
         },
-        data: {}
-    }
-    for (let key in state.auth.creds)
-        if (state.auth.creds.hasOwnProperty(key))
-            state.auth.creds[key] = storage[key] || query[key] || state.auth.creds[key]
-
-    return state
-})()
+        config: {
+            discoveryDocs: [
+                "https://sheets.googleapis.com/$discovery/rest?version=v4",
+                "https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"
+            ],
+            scope: [
+                "https://www.googleapis.com/auth/spreadsheets",
+                "https://www.googleapis.com/auth/calendar.readonly"
+            ].join(" ")
+        }
+    },
+    data: {}
+}
 
 const getters = {
     authConfig(state) {
@@ -89,11 +60,6 @@ const getters = {
     },
     lookup(state) {
         return (namespace) => Object.values(state.data[namespace] || {})
-    },
-    existingSheets(state) {
-        return state.auth.spreadsheet
-            ? state.auth.spreadsheet.sheets.map((sheet) => sheet.properties.title)
-            : []
     }
 }
 
@@ -105,53 +71,50 @@ const store = new Vuex.Store({
 
 store.watch((state) => state.auth.creds, (auth) => {
     localStorage.setItem("auth", JSON.stringify(auth))
-    authGoogle(store, store.getters.authConfig)
+    google.auth(store.getters.authConfig, (isAuthed) => store.commit(mutations.updateAuth.name, isAuthed))
 }, {deep: true})
 
 store.watch((state) => state.auth.active, () => {
     if (!store.state.auth.active) return
 
-    (store.state.auth.creds.spreadsheetId
-        ? google
-            .getSpreadsheet(store.state.auth.creds.spreadsheetId)
-            .then((res) => store.commit(mutations.setSpreadsheet.name, res.result))
-            .then(() => {
-                google
-                    .fetchSpreadsheet(store.state.auth.creds.spreadsheetId, store.getters.existingSheets)
-                    .then((data) => Object.keys(data)
-                        .filter((key) => key in MODEL_MAP)
-                        .forEach((key) => (data[key] || [])
-                            .forEach((record) => {
-                                store.commit(mutations.saveModel.name, new MODEL_MAP[key]().fromArray(record))
-                            })))
+    const createSpreadsheet = store.state.auth.creds.spreadsheetId
+        ? Promise.resolve({spreadsheetId: store.state.auth.creds.spreadsheetId})
+        : google.createSpreadsheet("NCCDB")
+    createSpreadsheet
+        .then((res) => {
+            // UPDATE LOCAL SPREADSHEET ID & FETCH DATA
+            store.commit(mutations.updateCreds.name, {
+                ...store.state.auth.creds,
+                spreadsheetId: res.spreadsheetId
             })
-        : google
-            .createSpreadsheet("NCCDB", [])
-            .then((res) => {
-                store.commit(mutations.updateCreds.name, {
-                    ...store.state.auth.creds,
-                    spreadsheetId: res.result.spreadsheetId
-                })
-                store.commit(mutations.setSpreadsheet.name, res.result)
-                return res
-            }))
-        .then(() => Promise.all([
-            store.state.auth.creds.spreadsheetId ? importSpreadsheet(store) : Promise.resolve(),
-            store.state.auth.creds.calendarId ? importCalendar(store) : Promise.resolve()
-        ]))
+            return Promise.all([
+                google.fetchSpreadsheet(res.spreadsheetId),
+                store.state.auth.creds.calendarId
+                    ? google.fetchEvents(store.state.auth.creds.calendarId)
+                    : Promise.resolve([])
+            ])
+        })
+        .then(([spreadsheet, events]) => {
+            // STORE GOOGLE DATA LOCALLY
+            store.commit(mutations.setSpreadsheet.name, spreadsheet)
+            Object.keys(spreadsheet.data)
+                .filter((key) => key in MODEL_MAP)
+                .forEach((key) => spreadsheet.data[key]
+                    .forEach((record) => {
+                        store.commit(mutations.saveModel.name, new MODEL_MAP[key]().fromArray(record))
+                    }))
+            events.forEach((event) => store.commit(mutations.saveModel.name, new Event(event)))
+        })
 })
 store.watch((state) => state.data, (data) => {
-    if (store.state.auth.creds.spreadsheetId) {
-        const missingSheets = Object.keys(data)
-            .filter((key) => !store.getters.existingSheets.includes(key));
+    if (!store.state.auth.creds.spreadsheetId) return
 
-        (missingSheets.length
-            ? google.createSheets(store.state.auth.creds.spreadsheetId, missingSheets)
-            : Promise.resolve())
-            .then(() => google.exportSpreadsheet(store.state.auth.creds.spreadsheetId, data))
-    }
+    google.persistSpreadsheetValues(store.state.auth.creds.spreadsheetId, Object.keys(data).reduce((acc, key) => ({
+        ...acc,
+        [key]: Object.values(data[key]).map((model) => model.toArray())
+    }), {}))
 }, {deep: true})
 
-authGoogle(store, store.getters.authConfig)
+google.auth(store.getters.authConfig, (isAuthed) => store.commit(mutations.updateAuth.name, isAuthed))
 
 export default store
