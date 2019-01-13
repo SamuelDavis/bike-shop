@@ -38,12 +38,12 @@ const google = {
             return getAuth().isSignedIn.get()
         },
 
-        signin() {
+        signIn() {
             const request = getAuth().signIn()
             return thenify(request)
         },
 
-        signout() {
+        signOut() {
             const request = getAuth().signOut()
             return thenify(request)
         }
@@ -125,7 +125,7 @@ export function auth(config, listener = () => undefined) {
             listener(google.auth.getStatus())
             return google.auth.getStatus()
                 ? Promise.resolve()
-                : google.auth.signin()
+                : google.auth.signIn()
         })
 }
 
@@ -152,4 +152,5 @@ export function persistSpreadsheetValues(spreadsheetId, data) {
 
 export const fetchEvents = google.calendar.fetchEvents.bind(google.calendar)
 export const createSpreadsheet = google.spreadsheet.create.bind(google.spreadsheet)
-export const getAuthStatus = google.auth.getStatus.bind(google.auth)
+export const signIn = google.auth.signIn.bind(google.auth)
+export const signOut = google.auth.signOut.bind(google.auth)

@@ -18,13 +18,11 @@ export default {
                 this.$store.commit(mutations.updateCreds.name, auth)
             }
         },
-        isAuthed: {
-            get() {
-                return this.$store.state.auth.active
-            },
-            set(isAuthed) {
-                this.$store.commit(mutations.updateAuth.name, isAuthed)
-            }
+        spreadsheet() {
+            return this.$store.state.auth.spreadsheet
+        },
+        isAuthed() {
+            return this.$store.getters.isAuthed
         },
         formInputs() {
             return [
@@ -39,11 +37,7 @@ export default {
         updateAuth(data) {
             this.auth = data
         },
-        signIn(e) {
-            google.signin()
-        },
-        signOut(e) {
-            google.signout()
-        }
+        signIn: google.signIn.bind(google),
+        signOut: google.signOut.bind(google)
     }
 }

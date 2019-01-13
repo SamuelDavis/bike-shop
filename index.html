@@ -100,9 +100,8 @@
     <div class="container">
         <button v-if="isAuthed" class="btn btn-danger" @click="signOut">Sign Out</button>
         <button v-else class="btn btn-success" @click="signIn">Sign In</button>
-        <a v-if="isAuthed && auth.spreadsheetId" class="btn btn-primary"
-           :href="`https://docs.google.com/spreadsheets/d/${auth.spreadsheetId}`" target="_blank">Open
-            Spreadsheet</a>
+        <a v-if="spreadsheet && spreadsheet.spreadsheetUrl" class="btn btn-primary" :href="spreadsheet.spreadsheetUrl"
+           target="_blank">Open Spreadsheet</a>
         <hr>
         <gen-form :inputs="formInputs" :onSubmit="updateAuth"/>
     </div>
