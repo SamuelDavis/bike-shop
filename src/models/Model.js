@@ -1,28 +1,26 @@
 export default class Model {
     constructor(data = {}) {
-        Object.keys(this.properties).forEach((prop) => this[prop] = this.mutatorFor(prop)(data[prop]))
-    }
+        this.data = data
 
-    mutatorFor(prop) {
-        return this[`mut_${prop}`] || function (value) {
-            return value
-        }
+        Object.defineProperties(this, this.properties.reduce((acc, prop) => ({
+            ...acc, [prop]: {
+                get: () => this.data[prop],
+                set: (val) => this.data[prop] = val,
+                configurable: true
+            }
+        }), {}))
     }
 
     get properties() {
-        return {
-            id: String,
-            createdAt: Date,
-            updatedAt: Date
-        }
+        return ["id", "createdAt", "updatedAt"]
     }
 
     fromArray(arr) {
-        Object.keys(this.properties).forEach((prop, i) => this[prop] = this.mutatorFor(prop)(arr[i]))
+        this.properties.forEach((prop, i) => this[prop] = arr[i])
         return this
     }
 
     toArray() {
-        return Object.keys(this.properties).map((prop) => this[prop])
+        return this.properties.map((prop) => this[prop])
     }
 }

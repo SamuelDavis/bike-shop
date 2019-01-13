@@ -6,18 +6,18 @@ export const ROLES = {
 }
 
 export default class User extends Model {
-    get properties() {
-        return {
-            ...super.properties,
-            name: String,
-            phone: String,
-            email: String,
-            address: String,
-            role: String
-        }
+    constructor(data = {}) {
+        super(data)
+        Object.defineProperties(this, {
+            role: {
+                set: (role) => this.data.role = parseInt(role, 10)
+            }
+        })
     }
 
-    mut_role(role) {
-        return role === undefined ? undefined : parseInt(role, 10)
+    get properties() {
+        return super.properties.concat([
+            "name", "phone", "email", "address", "role"
+        ])
     }
 }
