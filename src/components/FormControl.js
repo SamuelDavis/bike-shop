@@ -13,7 +13,7 @@ export default {
         }
     },
     render(createElement) {
-        const type = this.type instanceof String
+        const type = typeof this.type === "string"
             ? this.type
             : {
                 [Boolean]: "checkbox",
@@ -48,6 +48,7 @@ export default {
         const attributes = {
             attrs: {type, value: this.value, class: ["form-control"], ...this.meta}
         }
+
         return createElement("input", attributes, [])
     }
 }

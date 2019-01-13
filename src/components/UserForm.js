@@ -1,8 +1,7 @@
 import FormInput from "../models/FormInput.js"
 import GenForm from "./GenForm.js"
 import store, {mutations} from "../store.js"
-import User, {ROLES} from "../data/User.js"
-import * as faker from "../util/faker.js"
+import User from "../data/User.js"
 
 export default {
     template: "#model-form",
@@ -10,21 +9,25 @@ export default {
         "gen-form": GenForm
     },
     store,
-    data() {
-        return {
-            inputs: [
-                new FormInput("name", "Name", `${faker.str(5)} ${faker.str(7)}`, true),
-                new FormInput("phone", "Phone Number", faker.int(7)),
-                new FormInput("email", "Email", `${faker.str(7)}@gmail.com`),
-                new FormInput("address", "Address", faker.str()),
-                new FormInput("role", "Role", faker.randFrom(Object.values(ROLES)))
+    computed: {
+        user() {
+            return this.$store.state.data[User.name][this.$route.params.id] || new User()
+        },
+        inputs() {
+            return [
+                new FormInput("id", "Id", this.user.id, true).hidden(),
+                new FormInput("name", "Name", this.user.name, true),
+                new FormInput("phone", "Phone Number", this.user.phone),
+                new FormInput("email", "Email", this.user.email),
+                new FormInput("address", "Address", this.user.address),
+                new FormInput("role", "Role", this.user.role)
             ]
         }
     },
     methods: {
         handleSubmit(data) {
             const model = new User(data)
-            this.$store.commit(mutations.saveModel.name, model)
+            this.$store.commit(mutations.saveModels.name, [model])
         }
     }
 }

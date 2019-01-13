@@ -37,7 +37,9 @@ function storeData(store, spreadsheet, events) {
     store.commit(mutations.saveModels.name, models)
 }
 
-const MODEL_MAP = [Event, User].reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
+const MODELS = [Event, User]
+
+const MODEL_MAP = MODELS.reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
 
 export const mutations = {
     updateAuth(state, isAuthed) {
@@ -49,7 +51,7 @@ export const mutations = {
     saveModels(state, models) {
         const data = models.reduce((acc, model) => {
             const namespace = model.constructor.name
-            model.id = model.id === undefined ? faker.str() : model.id
+            model.id = model.id || faker.str()
             model.createdAt = model.createdAt || new Date()
             model.updatedAt = new Date()
 
@@ -92,7 +94,7 @@ const state = {
             ].join(" ")
         }
     },
-    data: {}
+    data: MODELS.reduce((acc, model) => ({...acc, [model.name]: {}}), {})
 }
 
 const getters = {

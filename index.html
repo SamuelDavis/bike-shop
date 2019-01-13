@@ -7,21 +7,15 @@
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Bike Shop</title>
-    <link rel="stylesheet" href="vendor/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="//localhost:8000/vendor/bootstrap.min.css" type="text/css">
 </head>
 <body>
 <div id="app"></div>
-<script src="vendor/vue.js" type="application/javascript"></script>
-<script src="vendor/vuex.js" type="application/javascript"></script>
-<script src="vendor/vue-router.js" type="application/javascript"></script>
-<script src="vendor/client.js" type="application/javascript"></script>
-<script type="module">
-    import errorHandler from "./src/util/errorHandler.js"
-    import main from "./src/index.js"
-
-    addEventListener("error", errorHandler)
-    document.addEventListener("DOMContentLoaded", main)
-</script>
+<script src="//localhost:8000/vendor/vue.js" type="application/javascript"></script>
+<script src="//localhost:8000/vendor/vuex.js" type="application/javascript"></script>
+<script src="//localhost:8000/vendor/vue-router.js" type="application/javascript"></script>
+<script src="//localhost:8000/vendor/client.js" type="application/javascript"></script>
+<script type="module" src="//localhost:8000/index.js"></script>
 <script id="app-template" type="text/x-template">
     <div>
         <app-nav class="mb-3 navbar-light bg-light"/>
@@ -108,7 +102,7 @@
 </script>
 <script id="gen-form-template" type="text/x-template">
     <form @submit="handleSubmit">
-        <div v-for="input in inputs" :key="input.id" class="form-group">
+        <div v-for="input in inputs" v-show="input.type !== 'hidden'" :key="input.id" class="form-group">
             <label :for="input.id">
                 <span v-if="input.required" class="text-danger">*</span>
                 <span v-text="input.label"></span>

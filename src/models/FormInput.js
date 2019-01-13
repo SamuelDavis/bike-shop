@@ -9,4 +9,9 @@ export default class FormInput {
         this.required = required
         this.type = "text"
     }
+
+    hidden() {
+        this.type = "hidden"
+        return this
+    }
 }
