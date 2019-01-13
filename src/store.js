@@ -2,6 +2,7 @@ import * as google from "./util/google.js"
 import {parseQuery} from "./util/str.js"
 import * as faker from "./util/faker.js"
 import Event from "./models/Event.js"
+import User from "./data/User.js"
 
 function signInListener(store, isAuthed) {
     store.commit(mutations.updateAuth.name, isAuthed)
@@ -28,14 +29,15 @@ function fetchData(store, spreadsheetId, calendarId) {
 
 function storeData(store, spreadsheet, events) {
     store.commit(mutations.setSpreadsheet.name, spreadsheet)
-    Object.keys(spreadsheet.data)
+    const models = Object.keys(spreadsheet.data)
         .filter((key) => key in MODEL_MAP)
-        .forEach((key) => spreadsheet.data[key]
-            .forEach((record) => store.commit(mutations.saveModel.name, new MODEL_MAP[key]().fromArray(record))))
-    events.forEach((event) => store.commit(mutations.saveModel.name, new Event(event)))
+        .reduce((acc, key) => [...acc, ...spreadsheet.data[key]
+            .map((record) => new MODEL_MAP[key]().fromArray(record))], [])
+        .concat(events.map((event) => new Event(event)))
+    store.commit(mutations.saveModels.name, models)
 }
 
-const MODEL_MAP = [Event].reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
+const MODEL_MAP = [Event, User].reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
 
 export const mutations = {
     updateAuth(state, isAuthed) {
@@ -44,15 +46,22 @@ export const mutations = {
     updateCreds(state, creds) {
         state.auth.creds = creds
     },
-    saveModel(state, model) {
-        const namespace = model.constructor.name
-        Vue.set(state.data, namespace, state.data[namespace] || {})
+    saveModels(state, models) {
+        const data = models.reduce((acc, model) => {
+            const namespace = model.constructor.name
+            model.id = model.id === undefined ? faker.str() : model.id
+            model.createdAt = model.createdAt || new Date()
+            model.updatedAt = new Date()
 
-        model.id = model.id === undefined ? faker.str() : model.id
-        model.createdAt = model.createdAt || new Date()
-        model.updatedAt = new Date()
+            return {
+                ...acc, [namespace]: {
+                    ...(acc[namespace] || {}),
+                    [model.id]: model
+                }
+            }
+        }, state.data)
 
-        Vue.set(state.data[namespace], model.id, model)
+        Vue.set(state, "data", data)
     },
     setSpreadsheet(state, spreadsheet) {
         state.auth.spreadsheet = spreadsheet
