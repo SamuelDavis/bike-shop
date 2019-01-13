@@ -89,7 +89,7 @@ const google = {
                 .then((res) => {
                     return res.result.valueRanges.reduce((acc, valueRange) => {
                         const namespace = valueRange.range.split("!")[0]
-                        const records = valueRange.values
+                        const records = valueRange.values || []
                         return {...acc, [namespace]: records}
                     }, {})
                 })
