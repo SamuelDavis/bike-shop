@@ -1,6 +1,12 @@
 export default class Model {
     constructor(data = {}) {
-        Object.keys(this.properties).forEach((prop) => this[prop] = data[prop])
+        Object.keys(this.properties).forEach((prop) => this[prop] = this.mutatorFor(prop)(data[prop]))
+    }
+
+    mutatorFor(prop) {
+        return this[`mut_${prop}`] || function (value) {
+            return value
+        }
     }
 
     get properties() {
@@ -12,7 +18,7 @@ export default class Model {
     }
 
     fromArray(arr) {
-        Object.keys(this.properties).forEach((prop, i) => this[prop] = arr[i])
+        Object.keys(this.properties).forEach((prop, i) => this[prop] = this.mutatorFor(prop)(arr[i]))
         return this
     }
 

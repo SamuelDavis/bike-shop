@@ -1,7 +1,7 @@
 import FormInput from "../models/FormInput.js"
 import GenForm from "./GenForm.js"
 import store, {mutations} from "../store.js"
-import User from "../data/User.js"
+import User, {ROLES} from "../data/User.js"
 
 export default {
     template: "#model-form",
@@ -15,12 +15,12 @@ export default {
         },
         inputs() {
             return [
-                new FormInput("id", "Id", this.user.id, true).hidden(),
-                new FormInput("name", "Name", this.user.name, true),
+                new FormInput("id", "Id", this.user.id, true).isHidden(),
+                new FormInput("name", "Name", this.user.name).isRequired(),
                 new FormInput("phone", "Phone Number", this.user.phone),
-                new FormInput("email", "Email", this.user.email),
+                new FormInput("email", "Email", this.user.email).isEmail(),
                 new FormInput("address", "Address", this.user.address),
-                new FormInput("role", "Role", this.user.role)
+                new FormInput("role", "Role", this.user.role).isSelect(ROLES)
             ]
         }
     },

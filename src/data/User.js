@@ -16,4 +16,8 @@ export default class User extends Model {
             role: String
         }
     }
+
+    mut_role(role) {
+        return role === undefined ? undefined : parseInt(role, 10)
+    }
 }

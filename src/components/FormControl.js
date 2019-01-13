@@ -25,24 +25,23 @@ export default {
             }[this.type]
 
         if (type === "select") {
-            const attributes = {}
-            let children = []
-            if (this.data instanceof Array) {
-                children = this.data.map(([value, label]) => createElement("option", {
-                    attrs: {value, selected: this.value === value}
-                }, label))
-            } else if (this.data instanceof Object) {
-                children = Object
-                    .keys(this.data || {})
-                    .map((key) => createElement("option", {
-                        attrs: {value: this.data[key], selected: this.value === key}
-                    }, this.data[key]))
+            const attributes = {
+                attrs: {type, value: this.value, class: ["custom-select"], ...this.meta}
             }
+            let children = []
+            if (this.data instanceof Array) children = this.data.map(([value, label]) => {
+                return createElement("option", {
+                    attrs: {value, selected: this.value === value}
+                }, label)
+            })
             return createElement("select", attributes, children)
         }
 
         if (type === "checkbox") {
-            return createElement("checkbox", {attrs: {checked: this.data}}, [])
+            const attributes = {
+                attrs: {type, checked: this.value}
+            }
+            return createElement("checkbox", attributes, [])
         }
 
         const attributes = {
