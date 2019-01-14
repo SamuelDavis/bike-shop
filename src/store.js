@@ -16,9 +16,9 @@ function signInListener(store, isAuthed) {
 }
 
 function createSpreadsheet(spreadsheetId = undefined, name = "NCCDB") {
-    return spreadsheetId
+    return (spreadsheetId
         ? Promise.resolve({spreadsheetId})
-        : google.createSpreadsheet(name)
+        : google.createSpreadsheet(name))
 }
 
 function fetchData(store, spreadsheetId, calendarId) {
@@ -154,7 +154,7 @@ store.watch((state, getters) => getters.isAuthed, (isAuthed) => {
     if (!isAuthed) return
 
     createSpreadsheet(store.getters.spreadsheetId)
-        .then((res) => fetchData(store, res.spreadsheetId, store.getters.calendarId))
+        .then((res) => fetchData(store, res.result.spreadsheetId, store.getters.calendarId))
         .then(([spreadsheet, events]) => storeData(store, spreadsheet, events))
 })
 store.watch((state) => state.data, (data) => {

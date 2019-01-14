@@ -1,3 +1,5 @@
+import * as flash from "./flash.js"
+
 export function noop() {
     return undefined
 }
@@ -5,7 +7,13 @@ export function noop() {
 export function proxy(thing = () => ({then: () => Promise.reject(new Error("Proxy fail."))})) {
     return new Proxy(thing, {
         get(src, prop) {
-            return prop in src ? proxy(src[prop]) : proxy()
+            if (prop in src) {
+                return typeof src[prop] === "object"
+                    ? proxy(src[prop])
+                    : src[prop]
+            }
+
+            return proxy()
         }
     })
 }
@@ -50,7 +58,8 @@ export function extractForm(form) {
 }
 
 export function errorHandler(err) {
-    console.error(err.error && err.error.error ? err.error.error : err)
+    flash.danger(proxy(err).error.result.error.message || err.message, 0)
+    console.error(err)
 }
 
 export function fuzzySearch(term = "", items = [], props = []) {
