@@ -1,5 +1,6 @@
 import {promisify} from "./promise.js"
 import {proxy} from "./proxy.js"
+import {noop} from "./misc.js"
 
 function thenify(request) {
     return promisify(request.then.bind(request))
@@ -114,7 +115,7 @@ const google = {
     }
 }
 
-export function auth(config, listener = () => undefined) {
+export function auth(config, listener = noop) {
     return google.init
         .loadLibrary()
         .then(() => {

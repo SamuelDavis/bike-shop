@@ -38,53 +38,17 @@
 <script id="attendance-page-template" type="text/x-template">
     <div class="container">
         <div v-if="!targetEvent" class="card-columns">
-            <div v-for="event in events" class="card" style="cursor: pointer;" @click="targetEvent = event">
-                <div class="card-body">
-                    <p class="card-title" v-text="event.summary"></p>
-                    <p v-if="event.description" class="card-text" v-text="event.description"></p>
-                    <p class="card-text" v-if="event.location" v-text="event.location"></p>
-                    <table class="table-sm small">
-                        <tbody>
-                        <tr>
-                            <td>From</td>
-                            <td v-text="event.start"></td>
-                        </tr>
-                        <tr v-if="event.end">
-                            <td>To</td>
-                            <td v-text="event.end"></td>
-                        </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            <event-card v-for="event in events" :key="event.id" :event="event" :onClick="() => targetEvent = event"/>
         </div>
         <div v-if="targetEvent">
-            <div class="card">
-                <div class="row">
-                    <div class="col col-lg">
-                        <div class="card-body">
-                            <p class="card-title" v-text="targetEvent.summary"></p>
-                            <p v-if="targetEvent.description" class="card-text" v-text="targetEvent.description"></p>
-                            <p class="card-text" v-if="targetEvent.location" v-text="targetEvent.location"></p>
-                            <table class="table-sm small">
-                                <tbody>
-                                <tr>
-                                    <td>From</td>
-                                    <td v-text="targetEvent.start"></td>
-                                </tr>
-                                <tr v-if="targetEvent.end">
-                                    <td>To</td>
-                                    <td v-text="targetEvent.end"></td>
-                                </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="col col-sm">
-                        <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select
-                            Different Event
-                        </button>
-                    </div>
+            <div class="row">
+                <div class="col col-lg">
+                    <event-card :event="targetEvent"/>
+                </div>
+                <div class="col col-sm">
+                    <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select
+                        Different Event
+                    </button>
                 </div>
             </div>
         </div>
@@ -111,6 +75,27 @@
         </div>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
+</script>
+<script id="event-card-template" type="text/x-template">
+    <div class="card" :style="{cursor: clickable ? 'pointer' : undefined}" @click="onClick">
+        <div class="card-body">
+            <p class="card-title" v-text="event.summary"></p>
+            <p v-if="event.description" class="card-text" v-text="event.description"></p>
+            <p class="card-text" v-if="event.location" v-text="event.location"></p>
+            <table class="table-sm small">
+                <tbody>
+                <tr>
+                    <td>From</td>
+                    <td v-text="event.start"></td>
+                </tr>
+                <tr v-if="event.end">
+                    <td>To</td>
+                    <td v-text="event.end"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
 </script>
 </body>
 </html>

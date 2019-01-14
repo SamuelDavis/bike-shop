@@ -1,5 +1,6 @@
 import {extractForm} from "../util/form.js"
 import FormControl from "./FormControl.js"
+import {noop} from "../util/misc.js"
 
 export default {
     template: "#gen-form-template",
@@ -13,7 +14,7 @@ export default {
         },
         onSubmit: {
             type: Function,
-            default: () => undefined
+            default: noop
         }
     },
     computed: {
