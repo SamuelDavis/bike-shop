@@ -4,5 +4,11 @@ export default class Route {
         this.label = label
         this.name = label
         this.component = component
+        this.hidden = false
+    }
+
+    isHidden() {
+        this.hidden = true
+        return this
     }
 }

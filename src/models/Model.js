@@ -15,7 +15,7 @@ export default class Model {
     }
 
     ensureId() {
-        this.id = this.id || faker.str()
+        this.id = this.id || faker.str(20)
         return this
     }
 

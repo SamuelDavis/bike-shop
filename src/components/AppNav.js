@@ -14,7 +14,7 @@ export default {
             return this.$router.options.routes[0]
         },
         routes() {
-            return this.$router.options.routes.slice(1)
+            return this.$router.options.routes.slice(1).filter((route) => !route.hidden)
         }
     }
 }

@@ -1,12 +1,12 @@
-import Event from "../models/Event.js"
 import {noop} from "../util/misc.js"
+import User from "../data/User.js"
 
 export default {
-    template: "#event-card-template",
+    template: "#user-card-template",
     props: {
-        event: {
-            type: Event,
-            default: () => new Event()
+        user: {
+            type: User,
+            default: () => new User()
         },
         onClick: {
             type: Function,

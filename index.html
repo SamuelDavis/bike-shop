@@ -54,7 +54,14 @@
         </div>
     </div>
 </script>
-<script id="data-store-page-template" type="text/x-template">
+<script id="user-page-template" type="text/x-template">
+    <div class="container">
+        <div class="card-columns">
+            <user-card v-for="user in users" :key="user.id" :user="user" :onClick="() => editUser(user)"/>
+        </div>
+    </div>
+</script>
+<script id="auth-page-template" type="text/x-template">
     <div class="container">
         <button v-if="isAuthed" class="btn btn-danger" @click="signOut">Sign Out</button>
         <button v-else class="btn btn-success" @click="signIn">Sign In</button>
@@ -77,7 +84,7 @@
     </form>
 </script>
 <script id="event-card-template" type="text/x-template">
-    <div class="card" :style="{cursor: clickable ? 'pointer' : undefined}" @click="onClick">
+    <div class="card" :style="style" @click="onClick">
         <div class="card-body">
             <p class="card-title" v-text="event.summary"></p>
             <p v-if="event.description" class="card-text" v-text="event.description"></p>
@@ -91,6 +98,22 @@
                 <tr v-if="event.end">
                     <td>To</td>
                     <td v-text="event.end"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</script>
+<script id="user-card-template" type="text/x-template">
+    <div class="card" :style="style" @click="onClick">
+        <div class="card-body">
+            <p class="card-title" v-text="user.name"></p>
+            <p class="card-text" v-if="user.location" v-text="user.address"></p>
+            <table class="table-sm small">
+                <tbody>
+                <tr v-for="value, prop in {email: 'Email', phone: 'Phone', address: 'Address'}" :key="prop">
+                    <td v-text="value"></td>
+                    <td v-text="user[prop] || 'missing...'"></td>
                 </tr>
                 </tbody>
             </table>

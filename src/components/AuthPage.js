@@ -4,7 +4,7 @@ import FormInput from "../models/FormInput.js"
 import store, {mutations} from "../store.js"
 
 export default {
-    template: "#data-store-page-template",
+    template: "#auth-page-template",
     components: {
         "gen-form": GenericForm
     },
