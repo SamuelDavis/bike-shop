@@ -108,18 +108,10 @@
             <p class="card-title" v-text="event.summary"></p>
             <p v-if="event.description" class="card-text" v-text="event.description"></p>
             <p class="card-text" v-if="event.location" v-text="event.location"></p>
-            <table class="table-sm small">
-                <tbody>
-                <tr>
-                    <td>From</td>
-                    <td v-text="event.start"></td>
-                </tr>
-                <tr v-if="event.end">
-                    <td>To</td>
-                    <td v-text="event.end"></td>
-                </tr>
-                </tbody>
-            </table>
+            <small>
+                <p class="card-text" v-text="`From ${event.start}`"></p>
+                <p v-if="event.end" class="card-text" v-text="`To ${event.end}`"></p>
+            </small>
         </div>
     </div>
 </script>
@@ -128,14 +120,10 @@
         <div class="card-body">
             <p class="card-title" v-text="user.name"></p>
             <p class="card-text" v-if="user.location" v-text="user.address"></p>
-            <table class="table-sm small">
-                <tbody>
-                <tr v-for="value, prop in {email: 'Email', phone: 'Phone', address: 'Address'}" :key="prop">
-                    <td v-text="value"></td>
-                    <td v-text="user[prop] || 'missing...'"></td>
-                </tr>
-                </tbody>
-            </table>
+            <small>
+                <p v-for="value, prop in {email: 'Email', phone: 'Phone', address: 'Address'}" :key="prop"
+                   class="card-text" v-text="`${value} ${user[prop] || 'missing...'}`"></p>
+            </small>
         </div>
     </div>
 </script>
