@@ -38,3 +38,8 @@ export function extractForm(form) {
 export function errorHandler(err) {
     console.error(err.error && err.error.error ? err.error.error : err)
 }
+
+export function fuzzySearch(term = "", items = [], props = []) {
+    const search = new RegExp(term.split("").reduce((acc, char) => `${acc}${char}.*`, "^.*") + "$", "i")
+    return items.filter((user) => props.reduce((acc, prop) => acc || search.exec(user[prop]), false))
+}

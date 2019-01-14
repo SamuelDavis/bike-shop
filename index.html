@@ -54,8 +54,15 @@
         </div>
     </div>
 </script>
-<script id="user-page-template" type="text/x-template">
+<script id="users-page-template" type="text/x-template">
     <div class="container">
+        <div class="input-group mb-2">
+            <input type="search" class="form-control" placeholder="search..." v-model="searchTerm">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" @click="searchTerm = ''">&times;</button>
+            </div>
+        </div>
+
         <div class="card-columns">
             <user-card v-for="user in users" :key="user.id" :user="user" :onClick="() => editUser(user)"/>
         </div>
