@@ -1,3 +1,5 @@
+import * as faker from "../util/faker.js"
+
 export default class Model {
     constructor(data = {}) {
         this.data = data
@@ -9,6 +11,13 @@ export default class Model {
                 configurable: true
             }
         }), {}))
+
+        this.ensureId()
+    }
+
+    ensureId() {
+        this.id = this.id || faker.str()
+        return this
     }
 
     get properties() {

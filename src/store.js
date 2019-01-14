@@ -1,6 +1,5 @@
 import * as google from "./util/google.js"
 import {parseQuery} from "./util/str.js"
-import * as faker from "./util/faker.js"
 import Event from "./models/Event.js"
 import User from "./data/User.js"
 
@@ -51,7 +50,7 @@ export const mutations = {
     saveModels(state, models) {
         const data = models.reduce((acc, model) => {
             const namespace = model.constructor.name
-            model.id = model.id || faker.str()
+            model.ensureId()
             model.createdAt = model.createdAt || new Date()
             model.updatedAt = new Date()
 

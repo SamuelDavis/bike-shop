@@ -12,12 +12,15 @@ export default {
             default: function (data) {
                 const model = new User(data)
                 this.$store.commit(mutations.saveModels.name, [model])
+                this.$router.push({name: "User", params: {id: model.id}})
             }
         }
     },
     computed: {
         user() {
-            return this.$store.state.data[User.name][this.$route.params.id] || new User()
+            const user = this.$store.state.data[User.name][this.$route.params.id] || new User()
+            console.log({user})
+            return user
         },
         controls() {
             return this.inputs.concat([
