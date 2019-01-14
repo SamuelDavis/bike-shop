@@ -16,6 +16,11 @@ export default {
             default: () => undefined
         }
     },
+    computed: {
+        controls() {
+            return this.inputs
+        }
+    },
     methods: {
         handleSubmit(e) {
             e.preventDefault()

@@ -102,18 +102,15 @@
 </script>
 <script id="gen-form-template" type="text/x-template">
     <form @submit="handleSubmit">
-        <div v-for="input in inputs" v-show="input.type !== 'hidden'" :key="input.id" class="form-group">
-            <label :for="input.id">
-                <span v-if="input.required" class="text-danger">*</span>
-                <span v-text="input.label"></span>
+        <div v-for="control in controls" v-show="control.type !== 'hidden'" :key="control.id" class="form-group">
+            <label :for="control.id">
+                <span v-if="control.required" class="text-danger">*</span>
+                <span v-text="control.label"></span>
             </label>
-            <form-control v-bind="input"/>
+            <form-control v-bind="control"/>
         </div>
         <button class="btn btn-primary" type="submit">Submit</button>
     </form>
-</script>
-<script id="model-form" type="text/x-template">
-    <gen-form :inputs="inputs" :onSubmit="handleSubmit"/>
 </script>
 </body>
 </html>
