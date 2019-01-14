@@ -72,6 +72,7 @@
     <div class="container">
         <button v-if="isAuthed" class="btn btn-danger" @click="signOut">Sign Out</button>
         <button v-else class="btn btn-success" @click="signIn">Sign In</button>
+        <button class="btn btn-default" @click="copyUrl">Copy URL</button>
         <a v-if="spreadsheet && spreadsheet.spreadsheetUrl" class="btn btn-primary" :href="spreadsheet.spreadsheetUrl"
            target="_blank">Open Spreadsheet</a>
         <hr>

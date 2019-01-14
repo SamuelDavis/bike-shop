@@ -25,6 +25,13 @@ export function parseQuery(query = window.location.search.slice(1)) {
         }, {})
 }
 
+export function buildQuery(obj = {}) {
+    return "?" + Object.keys(obj)
+        .filter((prop) => obj[prop] !== undefined)
+        .map((prop) => `${encodeURI(prop)}=${encodeURI(obj[prop])}`)
+        .join("&")
+}
+
 export function log(thing) {
     console.log(thing)
     return thing

@@ -2,6 +2,8 @@ import * as google from "../util/google.js"
 import GenericForm from "./GenForm.js"
 import FormInput from "../models/FormInput.js"
 import store, {mutations} from "../store.js"
+import * as flash from "../util/flash.js"
+import {buildQuery} from "../util/misc.js"
 
 export default {
     template: "#auth-page-template",
@@ -36,6 +38,15 @@ export default {
     methods: {
         updateAuth(data) {
             this.auth = data
+        },
+        copyUrl() {
+            const textarea = document.createElement("textarea")
+            textarea.value = `${window.location.host}/${buildQuery(this.auth)}`
+            document.body.appendChild(textarea)
+            textarea.select()
+            document.execCommand("copy")
+            document.body.removeChild(textarea)
+            flash.success("URL copied.")
         },
         signIn: google.signIn.bind(google),
         signOut: google.signOut.bind(google)
