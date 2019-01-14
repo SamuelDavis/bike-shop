@@ -1,766 +1,131 @@
 <!doctype html>
 <html lang="en">
 <head>
+    <link rel="icon" href="data:;base64,iVBORwOKGO="/>
     <meta charset="UTF-8">
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Bike Shop</title>
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
-          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link rel="stylesheet" href="/vendor/bootstrap.min.css" type="text/css">
+    <link rel="stylesheet" href="/index.css">
 </head>
 <body>
 <div id="app"></div>
-<script src="https://unpkg.com/vue@2.5.21/dist/vue.js"></script>
-<script src="https://unpkg.com/vuex/dist/vuex.js"></script>
-<script src="https://apis.google.com/js/client.js"></script>
+<script src="/vendor/vue.js" type="application/javascript"></script>
+<script src="/vendor/vuex.js" type="application/javascript"></script>
+<script src="/vendor/vue-router.js" type="application/javascript"></script>
+<script src="/vendor/client.js" type="application/javascript"></script>
+<script type="module" src="/index.js"></script>
 <script id="app-template" type="text/x-template">
     <div>
-        <app-nav :activePath="activePath" :routes="routes" :searchTerm="searchTerm" :onSearch="setSearch"/>
-        <div class="container">
-            <attendance-list v-show="isActiveRoute(routes[0])" :list="attendanceList" :onClick="toggleAttendance"/>
-            <generic-form v-show="isActiveRoute(routes[1])" legend="Add User" :onSubmit="addUser" :inputs="userInputs"/>
-            <generic-form v-show="isActiveRoute(routes[2])" legend="Add Bike" :onSubmit="addBike" :inputs="bikeInputs"/>
-            <generic-form v-show="isActiveRoute(routes[3])" legend="Add Todo" :onSubmit="addTodo" :inputs="todoInputs"/>
-            <auth v-show="isActiveRoute(routes[4])"/>
-        </div>
+        <app-nav class="mb-3 navbar-light bg-light"/>
+        <keep-alive>
+            <router-view></router-view>
+        </keep-alive>
     </div>
 </script>
 <script id="app-nav-template" type="text/x-template">
-    <nav class="navbar navbar-expand navbar-light bg-light">
-        <h3 class="navbar-brand">Bike Shop</h3>
+    <nav class="navbar navbar-expand">
+        <router-link :to="home.path" class="navbar-brand" v-text="home.label"></router-link>
         <ul class="navbar-nav mr-auto">
-            <li v-for="route in routes" :class="{'nav-item': true, 'active': route.path === activePath}">
-                <a :href="route.path" class="nav-link" v-text="route.label"></a>
-            </li>
+            <router-link v-for="route, i in routes" :key="route.path" :to="route.path" tag="li" class="nav-item"
+                         active-class="active">
+                <a href="#" class="nav-link" v-text="route.label"></a>
+            </router-link>
         </ul>
-        <form class="form-inline">
-            <div class="input-group">
-                <input type="search" class="form-control" placeholder="search..." v-model="search">
-                <div class="input-group-append">
-                    <button class="btn btn-outline-secondary" type="button" @click="resetSearch">&times;</button>
-                </div>
-            </div>
-        </form>
     </nav>
 </script>
-<script id="generic-form-template" type="text/x-template">
-    <form class="m-2" @submit="handleSubmit">
-        <legend v-if="legend" v-text="legend"></legend>
-        <div v-for="input in inputs" class="form-group">
-            <label :for="input.name">
-                <span v-if="input.required" class="text-danger">*</span>
-                <span v-text="input.label"></span>
-            </label>
-            <input v-if="input.type === String" type="text" :id="input.name" class="form-control" :name="input.name"
-                   :required="input.required" v-model="$data[input.name]">
-            <input v-if="input.type === Number" type="number" :id="input.name" class="form-control" :name="input.name"
-                   :required="input.required" v-model.number="$data[input.name]" :min="input.extra.min"
-                   :step="input.extra.step">
-            <input v-if="input.type === Date" type="date" :id="input.name" class="form-control" :name="input.name"
-                   :required="input.required" v-model="$data[input.name]">
-            <select v-if="input.type === Object" :name="input.name" :id="input.name" class="form-control"
-                    v-model="$data[input.name]">
-                <option v-for="val, key in input.value" :value="key" v-text="val.toString()"></option>
-            </select>
+<script id="attendance-page-template" type="text/x-template">
+    <div class="container">
+        <div v-if="!targetEvent" class="card-columns">
+            <event-card v-for="event in events" :key="event.id" :event="event" :onClick="() => targetEvent = event"/>
         </div>
-        <button class="btn btn-primary btn-block" type="submit">Save</button>
+        <div v-if="targetEvent">
+            <div class="row">
+                <div class="col col-lg">
+                    <event-card :event="targetEvent"/>
+                </div>
+                <div class="col col-sm">
+                    <button class="btn btn-warning w-100 h-100" @click="targetEvent = undefined">Select
+                        Different Event
+                    </button>
+                </div>
+            </div>
+            <div class="input-group my-2">
+                <input type="search" class="form-control" placeholder="search..." v-model="searchTerm">
+                <div class="input-group-append">
+                    <button class="btn btn-primary" type="button" @click="searchTerm = ''">&times;</button>
+                </div>
+            </div>
+
+            <div class="card-columns">
+                <user-card v-for="user in users" :key="user.id" :user="user" :onClick="() => toggleAttendance(user)"/>
+            </div>
+        </div>
+    </div>
+</script>
+<script id="users-page-template" type="text/x-template">
+    <div class="container">
+        <div class="input-group mb-2">
+            <input type="search" class="form-control" placeholder="search..." v-model="searchTerm">
+            <div class="input-group-append">
+                <button class="btn btn-primary" type="button" @click="searchTerm = ''">&times;</button>
+            </div>
+        </div>
+
+        <div class="card-columns">
+            <user-card v-for="user in users" :key="user.id" :user="user" :onClick="() => editUser(user)"/>
+        </div>
+    </div>
+</script>
+<script id="auth-page-template" type="text/x-template">
+    <div class="container">
+        <button v-if="isAuthed" class="btn btn-danger" @click="signOut">Sign Out</button>
+        <button v-else class="btn btn-success" @click="signIn">Sign In</button>
+        <button class="btn btn-default" @click="copyUrl">Copy URL</button>
+        <a v-if="spreadsheet && spreadsheet.spreadsheetUrl" class="btn btn-primary" :href="spreadsheet.spreadsheetUrl"
+           target="_blank">Open Spreadsheet</a>
+        <hr>
+        <gen-form :inputs="formInputs" :onSubmit="updateAuth"/>
+    </div>
+</script>
+<script id="gen-form-template" type="text/x-template">
+    <form @submit="handleSubmit">
+        <div v-for="control in controls" v-show="control.type !== 'hidden'" :key="control.id" class="form-group">
+            <label :for="control.id">
+                <span v-if="control.required" class="text-danger">*</span>
+                <span v-text="control.label"></span>
+            </label>
+            <form-control v-bind="control"/>
+        </div>
+        <button class="btn btn-primary" type="submit">Submit</button>
     </form>
 </script>
-<script id="attendance-list-template" type="text/x-template">
-    <div>
-        <button v-for="item in list" :class="classesFor(item)" v-text="item.user.name"
-                @click="() => onClick(item.user)"></button>
-    </div>
-</script>
-<script id="auth-template" type="text/x-template">
-    <div>
-        <div v-if="isAuthed">
-            <a v-if="config.spreadsheetUrl" :href="config.spreadsheetUrl" target="_blank">
-                <h3 v-text="config.properties ? config.properties.title || config.spreadsheetId : config.spreadsheetId"></h3>
-            </a>
-            <table class="table">
-                <thead>
-                <tr>
-                    <th>Type</th>
-                    <th>Count</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr v-for="records, prop in $store.state">
-                    <td v-text="prop"></td>
-                    <td v-text="records.length"></td>
-                </tr>
-                </tbody>
-            </table>
-            <button class="btn btn-block btn-primary" @click="exportDataStore">Export</button>
-            <button class="btn btn-block btn-warning" @click="importDataStore">Import</button>
+<script id="event-card-template" type="text/x-template">
+    <div class="card" :style="styles" @click="onClick">
+        <div class="card-body">
+            <p class="card-title" v-text="event.summary"></p>
+            <p v-if="event.description" class="card-text" v-text="event.description"></p>
+            <p class="card-text" v-if="event.location" v-text="event.location"></p>
+            <small>
+                <p class="card-text" v-text="`From ${event.start}`"></p>
+                <p v-if="event.end" class="card-text" v-text="`To ${event.end}`"></p>
+            </small>
         </div>
-        <generic-form legend="Authenticate" :onSubmit="authDataStore" :inputs="authInputs"/>
     </div>
 </script>
-<script type="application/javascript">
-    Date.prototype.toHtml = function () {
-        return [
-            new Date().getFullYear(),
-            new Date().getMonth() + 1,
-            new Date().getDate()
-        ].join("-")
-    }
-    const flash = {
-        info(text, type = "info") {
-            const div = document.createElement("div")
-            div.setAttribute("class", `alert alert-${type}`)
-            div.setAttribute("role", "alert")
-            div.innerText = text
-
-            const btn = document.createElement("button")
-            btn.setAttribute("class", "close")
-            btn.setAttribute("type", "button")
-            btn.innerHTML = "&times;"
-            btn.addEventListener("click", () => document.body.removeChild(div))
-
-            div.appendChild(btn)
-
-            document.body.prepend(div)
-        },
-        success(text) {
-            flash.info(text, "success")
-        },
-        danger(text) {
-            flash.info(text, "danger")
-        }
-    }
-    document.addEventListener("DOMContentLoaded", () => {
-        const ROLES = {
-            PARTICIPANT: 1,
-            VOLUNTEER: 2
-        }
-
-        class Faker {
-            static words(n = 2) {
-                const words = "lorem ipsum dolor sit amet consectetur adipisicing elit architecto asperiores autem culpa debitis exercitationem illo ipsa pariatur possimus ad temporibus".split(" ")
-                return (n ? new Array(n).fill(undefined).map(() => words[Faker.number(words.length)]) : words).join(" ")
-            }
-
-            static number(max = 100, min = 0) {
-                return Math.floor(Math.random() * (max - min)) + min
-            }
-
-            static randomFrom(collection) {
-                collection = Object.values(collection)
-                return collection[Math.floor(Math.random() * collection.length)]
-            }
-
-            static randomDate(start = new Date(new Date() - 24 * 7 * 4), end = new Date()) {
-                return new Date(start.getTime() + Math.random() * (end.getTime() - start.getTime()))
-            }
-        }
-
-        class Input {
-            constructor(type, name, label, value, required = false, extra = {}) {
-                this.type = type
-                this.name = name
-                this.label = label
-                this.value = value
-                this.required = required
-                this.extra = extra
-            }
-        }
-
-        class Route {
-            constructor(path, label) {
-                this.path = path
-                this.label = label
-            }
-        }
-
-        class Model {
-            constructor(id, createdAt, updatedAt) {
-                this.id = id
-                this.createdAt = createdAt
-                this.updatedAt = updatedAt
-            }
-
-            get required() {
-                return []
-            }
-
-            save() {
-                this.id = this.id || Math.random().toString(36).substr(3)
-                this.createdAt = this.createdAt || new Date()
-                this.updatedAt = new Date()
-
-                const missing = this.required.reduce((missing, required) => {
-                    return this[required] === undefined ? [...missing, required] : missing
-                }, [])
-
-                if (missing.length) throw new Error(`Unable to save ${this.constructor.name}, missing ${missing}`)
-            }
-
-            get properties() {
-                return ["id", "createdAt", "updatedAt"]
-            }
-
-            toArray() {
-                return this.properties.map((prop) => this[prop])
-            }
-
-            fromArray(arr) {
-                this.properties.map((prop, i) => this[prop] = arr[i])
-                return this
-            }
-        }
-
-        class User extends Model {
-            constructor(name, role = ROLES.VOLUNTEER) {
-                super()
-                this.name = name
-                this.role = role
-            }
-
-            get required() {
-                return ["name", "role"]
-            }
-
-            get properties() {
-                return super.properties.concat(["name", "role"])
-            }
-
-            toString() {
-                return this.name
-            }
-        }
-
-        class Bike extends Model {
-            constructor(description, appraisal, owner) {
-                super()
-                this.description = description
-                this.appraisal = appraisal
-                this.owner = owner
-            }
-
-            get required() {
-                return ["description"]
-            }
-
-            get properties() {
-                return super.properties.concat(["description", "appraisal", "owner"])
-            }
-
-            toString() {
-                return this.description
-            }
-
-            toArray() {
-                return [...super.toArray(), this.description, this.appraisal, this.owner]
-            }
-        }
-
-        class Todo extends Model {
-            constructor(bikeId, description, participantId, volunteerId, completedOn) {
-                super()
-                this.bikeId = bikeId
-                this.description = description
-                this.participantId = participantId
-                this.volunteerId = volunteerId
-                this.completedOn = completedOn
-            }
-
-            get required() {
-                return ["description", "participantId"]
-            }
-
-            get properties() {
-                return super.properties.concat(["bikeId", "description", "participantId", "volunteerId", "completedOn"])
-            }
-
-            toArray() {
-                return [...super.toArray(), this.bikeId, this.description, this.owner]
-            }
-        }
-
-        class Attendance extends Model {
-            constructor(userId, signedIn, signedOut) {
-                super()
-                this.userId = userId
-                this.signedIn = signedIn
-                this.signedOut = signedOut
-            }
-
-            get required() {
-                return ["userId", "signedIn"]
-            }
-
-            get properties() {
-                return super.properties.concat(["userId", "signedIn", "signedOut"])
-            }
-        }
-
-        function seed(store) {
-            const users = new Array(10)
-                .fill(undefined)
-                .map(() => new User(Faker.words(), Faker.randomFrom(ROLES)))
-            users.forEach((user) => store.commit(state.mutations.add.name, user))
-            const bikes = new Array(10)
-                .fill(undefined)
-                .map(() => new Bike(Faker.words(7), Faker.number(), Faker.randomFrom(users).id))
-            bikes.forEach((bike) => store.commit(state.mutations.add.name, bike))
-            const todos = bikes.reduce((acc, bike) => {
-                return [...acc, ...(new Array(Faker.number(9, 2)))
-                    .fill(undefined)
-                    .map(() => new Todo(bike.id, Faker.words(7), Faker.randomFrom(users).id, Faker.randomFrom(users).id, Faker.randomDate()))
-                ]
-            }, [])
-            todos.forEach((todo) => store.commit(state.mutations.add.name, todo))
-            return store
-        }
-
-        function promisify(func) {
-            return new Promise((resolve, reject) => func(resolve, reject))
-        }
-
-        const state = {
-            state: {
-                users: [],
-                bikes: [],
-                todos: [],
-                attendance: []
-            },
-            mutations: {
-                add(state, model) {
-                    model.save()
-                    const container = ({
-                        [User.name]: state.users,
-                        [Bike.name]: state.bikes,
-                        [Todo.name]: state.todos,
-                        [Attendance.name]: state.attendance
-                    })[model.constructor.name]
-                    let index = -1
-
-                    container.every((item, i) => {
-                        if (item.id === model.id) {
-                            index = i
-                            return false
-                        }
-                        return true
-                    })
-
-                    if (index === -1) {
-                        container.push(model)
-                    } else {
-                        container[index] = model
-                    }
-                },
-                replace(state, newState = {}) {
-                    for (let prop in newState) {
-                        if (newState.hasOwnProperty(prop)) {
-                            const source = newState[prop]
-                            const target = state[prop]
-                            const maxRange = Math.max(source.length, target.length)
-                            for (let i = 0; i < maxRange; i++) {
-                                state[prop].splice(i, 1, newState[prop][i])
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        const store = seed(new Vuex.Store(state))
-
-        Vue.component("app-nav", {
-            template: "#app-nav-template",
-            props: {
-                activePath: {
-                    type: String,
-                    default: ""
-                },
-                routes: {
-                    type: Array,
-                    default: () => []
-                },
-                searchTerm: {
-                    type: String,
-                    default: ""
-                },
-                onSearch: {
-                    type: Function,
-                    default: (searchTerm) => undefined
-                }
-            },
-            data() {
-                return {search: this.searchTerm}
-            },
-            watch: {
-                search(term) {
-                    this.onSearch(term)
-                }
-            },
-            methods: {
-                resetSearch() {
-                    this.search = ""
-                }
-            }
-        })
-
-        Vue.component("generic-form", {
-            template: "#generic-form-template",
-            props: {
-                legend: {
-                    type: String,
-                    default: undefined
-                },
-                inputs: {
-                    type: Array,
-                    default: () => []
-                },
-                onSubmit: {
-                    type: Function,
-                    default: () => undefined
-                }
-            },
-            data() {
-                return this.inputs.reduce((acc, input) => {
-                    return {
-                        ...acc,
-                        [input.name]: input.type === Object ? undefined : input.value
-                    }
-                }, {})
-            },
-            methods: {
-                reset() {
-                    this.inputs.forEach((input) => {
-                        this[input.name] = input.type === Object ? undefined : input.value
-                    })
-                },
-                handleSubmit(e) {
-                    e.preventDefault()
-                    const data = this.inputs.reduce((acc, input) => {
-                        return {...acc, [input.name]: this[input.name]}
-                    }, {})
-                    try {
-                        this.onSubmit(data)
-                        this.reset(e.target)
-                        flash.success("Saved")
-                    } catch (err) {
-                        console.error(err)
-                        flash.danger(err)
-                    }
-                    return false
-                }
-            }
-        })
-
-        Vue.component("attendance-list", {
-            template: "#attendance-list-template",
-            props: {
-                list: {
-                    type: Array,
-                    default: () => []
-                },
-                onClick: {
-                    type: Function,
-                    default: () => undefined
-                }
-            },
-            methods: {
-                classesFor(item) {
-                    return ['m-2', 'btn', `btn-${item.active ? 'success' : 'secondary'}`]
-                }
-            }
-        })
-
-        Vue.component("auth", {
-            template: "#auth-template",
-            store,
-            data() {
-                const config = {
-                    ...this.loadConfig(),
-                    discoveryDocs: ["https://sheets.googleapis.com/$discovery/rest?version=v4"],
-                    scope: "https://www.googleapis.com/auth/spreadsheets"
-                }
-                const isAuthed = false
-                return {config, isAuthed}
-            },
-            created() {
-                if (this.config.apiKey) {
-                    this.authDataStore()
-                        .then(() => this.importDataStore())
-                        .catch((error) => {
-                            flash.danger(error.details)
-                            console.error(error)
-                        })
-                }
-            },
-            computed: {
-                authInputs() {
-                    return [
-                        new Input(String, "clientId", "Client Id", this.config.clientId, true),
-                        new Input(String, "apiKey", "API Key", this.config.apiKey, true),
-                        new Input(String, "spreadsheetId", "Spreadsheet Id", this.config.spreadsheetId, false)
-                    ]
-                }
-            },
-            watch: {
-                config(newConfig, oldConfig) {
-                    localStorage.setItem("googleConfig", JSON.stringify(newConfig))
-                }
-            },
-            methods: {
-                loadConfig() {
-                    return JSON.parse(localStorage.getItem("googleConfig") || "{}")
-                },
-                signin() {
-                    gapi.auth2.getAuthInstance().signIn()
-                },
-                signout() {
-                    gapi.auth2.getAuthInstance().signOut()
-                },
-                onAuth(isAuthed) {
-                    this.isAuthed = isAuthed
-                    if (this.isAuthed) flash.success("Authed")
-                },
-                authDataStore(config = this.config) {
-                    return new Promise((resolve, reject) => {
-                        gapi.load('client:auth2', () => {
-                            this.config = {...this.config, ...config}
-                            gapi.client
-                                .init({...this.config})
-                                .then(() => {
-                                    gapi.auth2.getAuthInstance().isSignedIn.listen(this.onAuth)
-                                    this.onAuth(gapi.auth2.getAuthInstance().isSignedIn.get())
-                                    if (!this.isAuthed) this.signin()
-                                    resolve()
-                                }, (error) => {
-                                    console.error(error.details)
-                                    flash.danger(error.details)
-                                    reject(error)
-                                })
-                        })
-                    })
-                },
-                createDataStore() {
-                    const spreadsheetBody = {
-                        properties: {
-                            title: "Bike Shop DataStore"
-                        },
-                        sheets: Object.keys(this.$store.state).map((key) => {
-                            return {properties: {title: key}}
-                        }, [])
-
-                    }
-                    const request = gapi.client.sheets.spreadsheets.create({}, spreadsheetBody)
-                    return promisify(request.then.bind(request))
-                        .then((response) => {
-                            flash.success("Exported successfully")
-                            this.config = {...this.config, ...response.result}
-                        })
-                        .catch((reason) => {
-                            flash.danger(reason.result.error.message)
-                            console.error('error: ' + reason.result.error.message)
-                        })
-                },
-                exportDataStore() {
-                    (this.config.spreadsheetId
-                        ? Promise.resolve()
-                        : this.createDataStore())
-                        .then(() => {
-                            const requests = Object.keys(this.$store.state).map((key) => {
-                                const params = {
-                                    spreadsheetId: this.config.spreadsheetId,
-                                    range: key
-                                }
-                                const clearValuesRequestBody = {}
-                                const request = gapi.client.sheets.spreadsheets.values.clear(params, clearValuesRequestBody)
-                                return promisify(request.then.bind(request))
-                            })
-
-                            return Promise.all(requests)
-                        })
-                        .then(() => {
-                            const data = Object.keys(this.$store.state).map((key) => {
-                                const range = `${key}!A1:Z99999`
-                                const values = this.$store.state[key].map((record) => Object.values(record))
-                                return {range, values}
-                            })
-                            const body = {data, valueInputOption: "USER_ENTERED"}
-                            const request = gapi.client.sheets.spreadsheets.values.batchUpdate({
-                                spreadsheetId: this.config.spreadsheetId,
-                                resource: body
-                            })
-                            return promisify(request.then.bind(request))
-                        })
-                        .then((response) => {
-                            const result = response.result
-                            const msg = `${result.totalUpdatedCells} cells updated.`
-                            flash.success(msg)
-                            console.log(result)
-                        })
-                        .catch((reason) => {
-                            flash.danger(reason.result.error.message)
-                            console.error(reason)
-                        })
-                },
-                importDataStore() {
-                    (this.config.spreadsheetId
-                        ? Promise.resolve()
-                        : this.createDataStore())
-                        .then(() => {
-                            const ranges = Object.keys(this.$store.state)
-                            const request = gapi.client.sheets.spreadsheets.values.batchGet({
-                                spreadsheetId: this.config.spreadsheetId,
-                                ranges
-                            })
-                            return promisify(request.then.bind(request))
-                        })
-                        .then((response) => {
-                            const classMap = {
-                                users: User,
-                                bikes: Bike,
-                                todos: Todo,
-                                attendance: Attendance
-                            }
-                            const result = response.result
-                            flash.success(`${result.valueRanges.length} ranges retrieved.`)
-                            const newState = result.valueRanges.reduce((acc, valueRange) => {
-                                const namespace = valueRange.range.split("!")[0]
-                                const records = valueRange.values.map((value) => {
-                                    return new classMap[namespace]().fromArray(value)
-                                })
-                                return {...acc, [namespace]: records}
-                            }, {})
-                            this.$store.commit(state.mutations.replace.name, newState)
-                        })
-                        .catch((err) => {
-                            console.error(err)
-                        })
-                }
-            }
-        })
-
-        const app = new Vue({
-            el: "#app",
-            template: "#app-template",
-            store,
-            data() {
-                const routes = ["Attendance", "Users", "Bikes", "Todos", "Auth"]
-                    .map((label) => new Route(`#${label.toLowerCase()}`, label))
-                return {
-                    routes,
-                    activePath: window.location.hash || routes[0].path,
-                    searchTerm: ""
-                }
-            },
-            computed: {
-                fuzzySearchTerm() {
-                    return new RegExp(this.searchTerm
-                        .replace(/[\s]+/g, " ")
-                        .trim()
-                        .split("")
-                        .reduce((acc, term) => `${acc}${term}.*`, ".*"))
-                },
-                searchedUsers() {
-                    return this.fuzzySearch(this.$store.state.users)
-                },
-                searchedBikes() {
-                    return this.fuzzySearch(this.$store.state.bikes)
-                },
-                searchedTodos() {
-                    return this.fuzzySearch(this.$store.state.todos)
-                },
-                userInputs() {
-                    return [
-                        new Input(String, "name", "Name", "", true),
-                        new Input(Object, "role", "Role", Object.keys(ROLES).reduce((acc, key) => ({
-                            ...acc,
-                            [ROLES[key]]: key
-                        }), {}), true),
-                        new Input(Date, "createdAt", "Created At", new Date().toHtml(), true)
-                    ]
-                },
-                bikeInputs() {
-                    return [
-                        new Input(String, "description", "Description", "", true),
-                        new Input(Number, "appraisal", "Appraisal Value", 0, false, {step: "0.01", min: "0"}),
-                        new Input(Object, "owner", "Owner", this.searchedUsers),
-                        new Input(Date, "createdAt", "Created At", new Date().toHtml(), true)
-                    ]
-                },
-                todoInputs() {
-                    return [
-                        new Input(Object, "bikeId", "Bike", this.searchedBikes, true),
-                        new Input(String, "description", "Description", "", true),
-                        new Input(Object, "participantId", "Participant", this.searchedUsers),
-                        new Input(Object, "volunteerId", "Volunteer", this.searchedUsers),
-                        new Input(Date, "completedOn", "Completed On", undefined)
-                    ]
-                },
-                attendanceList() {
-                    const active = Object.values(this.$store.state.attendance).reduce((acc, record) => {
-                        return {
-                            ...acc,
-                            [record.userId]: record.signedOut === undefined
-                        }
-                    }, {})
-                    return this
-                        .fuzzySearch(this.$store.state.users, ["id", "name"])
-                        .map((user) => ({
-                            active: active[user.id] || false,
-                            user
-                        }))
-                        .sort((a, b) => b.active - a.active)
-                }
-            },
-            methods: {
-                isActiveRoute(route = new Route()) {
-                    return route.path === this.activePath
-                },
-                setSearch(term) {
-                    this.searchTerm = term
-                },
-                fuzzySearch(data, props = []) {
-                    return Object.values(data).filter((item) => {
-                        const searchable = props.length
-                            ? props.reduce((acc, prop) => ({...acc, [prop]: item[prop]}), {})
-                            : item
-                        return this.fuzzySearchTerm.exec(JSON.stringify(searchable))
-                    })
-                },
-                addUser(data) {
-                    const user = new User(data.name, data.role)
-                    this.$store.commit(state.mutations.add.name, user)
-                },
-                addBike(data) {
-                    const bike = new Bike(data.description, data.appraisal, data.owner)
-                    this.$store.commit(state.mutations.add.name, bike)
-                },
-                addTodo(data) {
-                    const todo = new Todo(data.description, data.participantId, data.volunteerId, data.completedOn)
-                    this.$store.commit(state.mutations.add.name, todo)
-                },
-                toggleAttendance(user) {
-                    const list = Object.values(this.$store.state.attendance)
-                    let record = undefined
-                    for (let i = list.length - 1; i >= 0; i--) {
-                        let item = list[i]
-                        if (item.userId === user.id && item.signedOut === undefined) {
-                            item.signedOut = new Date()
-                            record = item
-                            break
-                        }
-                    }
-
-                    record = record || new Attendance(user.id, new Date())
-                    this.$store.commit(state.mutations.add.name, record)
-                }
-            },
-            mounted() {
-                window.addEventListener("hashchange", (e) => {
-                    this.activePath = e.target.location.hash
-                })
-            }
-        })
-    })
+<script id="user-card-template" type="text/x-template">
+    <div :class="classes" :style="styles" @click="onClick">
+        <div class="card-body">
+            <p class="card-title" v-text="user.name"></p>
+            <p class="card-text" v-if="user.location" v-text="user.address"></p>
+            <small>
+                <p v-for="value, prop in {email: 'Email', phone: 'Phone', address: 'Address'}" :key="prop"
+                   class="card-text" v-text="`${value} ${user[prop] || 'missing...'}`"></p>
+            </small>
+        </div>
+    </div>
 </script>
 </body>
 </html>
