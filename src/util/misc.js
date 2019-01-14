@@ -39,7 +39,14 @@ export function log(thing) {
 
 export function extractForm(form) {
     return [...new FormData(form)]
-        .reduce((acc, [key, val]) => ({...acc, [key]: val}), {})
+        .reduce((acc, [key, val]) => {
+            if (key in acc) {
+                return (acc[key] instanceof Array)
+                    ? {...acc, [key]: [...acc[key], val]}
+                    : {...acc, [key]: [acc[key], val]}
+            }
+            return ({...acc, [key]: val})
+        }, {})
 }
 
 export function errorHandler(err) {

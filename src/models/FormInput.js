@@ -9,6 +9,7 @@ export default class FormInput {
         this.type = "text"
         this.data = undefined
         this.required = false
+        this.meta = {}
     }
 
     isRequired() {
@@ -26,10 +27,11 @@ export default class FormInput {
         return this
     }
 
-    isSelect(opts) {
+    isSelect(opts, multiple = false) {
         if (opts instanceof Object) {
             opts = Object.keys(opts).map((label) => [opts[label], label])
         }
+        this.meta.multiple = multiple
         this.type = Object
         this.data = opts
         return this
