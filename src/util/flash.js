@@ -7,7 +7,7 @@ const list = {
 
 function flash(type = list.INFO, text, timeout = defaultTimeout) {
     const div = document.createElement("div")
-    div.setAttribute("class", `alert alert-${type} position-sticky`)
+    div.setAttribute("class", `alert alert-${type} alert-fixed w-50`)
     div.setAttribute("role", "alert")
     div.innerText = text
     const remove = () => document.body.removeChild(div)

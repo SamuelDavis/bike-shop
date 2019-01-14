@@ -24,7 +24,7 @@ export default {
             return this.inputs.concat([
                 new FormInput("id", "Id", this.user.id, true).isHidden(),
                 new FormInput("name", "Name", this.user.name).isRequired(),
-                new FormInput("phone", "Phone Number", this.user.phone),
+                new FormInput("phone", "Phone Number", this.user.phone).isNumber({min: 1000000000, max: 99999999999}),
                 new FormInput("email", "Email", this.user.email).isEmail(),
                 new FormInput("address", "Address", this.user.address),
                 new FormInput("role", "Role", this.user.role).isSelect(ROLES),

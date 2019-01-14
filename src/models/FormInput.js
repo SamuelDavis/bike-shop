@@ -36,4 +36,10 @@ export default class FormInput {
         this.data = opts
         return this
     }
+
+    isNumber(meta = {min: undefined, max: undefined, step: 1}) {
+        Object.keys(meta).forEach((key) => Vue.set(this.meta, key, meta[key]))
+        this.type = Number
+        return this
+    }
 }

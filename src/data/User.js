@@ -25,4 +25,8 @@ export default class User extends Model {
     set_preferredLanguage(preferredLanguage) {
         Vue.set(this.data, "preferredLanguage", parseInt(preferredLanguage, 10))
     }
+
+    set_phone(phone) {
+        Vue.set(this.data, "phone", phone ? `1${phone}`.slice(-11) : "")
+    }
 }

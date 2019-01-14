@@ -3,6 +3,7 @@ import Event from "./data/Event.js"
 import User from "./data/User.js"
 import {parseQuery} from "./util/misc.js"
 import Attendance from "./data/Attendance.js"
+import * as flash from "./util/flash.js"
 
 const attendanceNamespace = [
     Attendance.name,
@@ -165,6 +166,7 @@ store.watch((state) => state.data, (data) => {
         [key === Attendance.name ? attendanceNamespace : key]: Object.values(data[key]).map((model) => model.toArray())
     }), {})
     google.persistSpreadsheetValues(spreadsheetId, spreadsheetData)
+        .then(() => flash.success("Saved."))
 }, {deep: true})
 
 google.auth(store.getters.authConfig, signInListener.bind(signInListener, store))
