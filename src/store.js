@@ -4,6 +4,12 @@ import User from "./data/User.js"
 import {parseQuery} from "./util/misc.js"
 import Attendance from "./data/Attendance.js"
 
+const attendanceNamespace = [
+    Attendance.name,
+    new Date().getFullYear(),
+    new Date().getMonth() + 1
+].join("-")
+
 function signInListener(store, isAuthed) {
     store.commit(mutations.updateAuth.name, isAuthed)
 }
@@ -20,7 +26,7 @@ function fetchData(store, spreadsheetId, calendarId) {
         spreadsheetId
     })
     return Promise.all([
-        google.fetchSpreadsheet(spreadsheetId),
+        google.fetchSpreadsheet(spreadsheetId, MODELS.map((model) => model === Attendance ? attendanceNamespace : model.name)),
         calendarId
             ? google.fetchEvents(calendarId)
             : Promise.resolve([])
@@ -32,12 +38,12 @@ function storeData(store, spreadsheet, events) {
     const models = Object.keys(spreadsheet.data)
         .filter((key) => key in MODEL_MAP)
         .reduce((acc, key) => [...acc, ...spreadsheet.data[key]
-            .map((record) => new MODEL_MAP[key]().fromArray(record))], [])
+            .map((record) => new MODEL_MAP[key === attendanceNamespace ? Attendance.name : key]().fromArray(record))], [])
         .concat(events.map((event) => new Event(event)))
     store.commit(mutations.saveModels.name, models)
 }
 
-const MODELS = [Event, User]
+const MODELS = [Event, User, Attendance]
 
 const MODEL_MAP = MODELS.reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
 
@@ -113,11 +119,19 @@ const getters = {
     calendarId(state) {
         return state.auth.creds.calendarId
     },
+    attendance(state, getters) {
+        return getters.lookup(Attendance.name)
+            .sort((a, b) => a.signedIn - b.signedIn)
+            .reduce((acc, record) => ({
+                ...acc,
+                [record.eventId]: {
+                    ...(acc[record.eventId] || {}),
+                    [record.userId]: record
+                }
+            }), {})
+    },
     lastAttendanceFor(state, getters) {
-        return (user, event) => getters
-            .lookup(Attendance.name)
-            .sort((a, b) => b.signedIn - a.signedIn)
-            .reduce((acc, record) => acc || record.eventId === event.id && record.userId === user.id && record, undefined)
+        return (user, event) => (getters.attendance[event.id] || {})[user.id]
     }
 }
 
@@ -145,7 +159,7 @@ store.watch((state) => state.data, (data) => {
     const spreadsheetId = store.getters.spreadsheetId
     const spreadsheetData = Object.keys(data).reduce((acc, key) => ({
         ...acc,
-        [key]: Object.values(data[key]).map((model) => model.toArray())
+        [key === Attendance.name ? attendanceNamespace : key]: Object.values(data[key]).map((model) => model.toArray())
     }), {})
     google.persistSpreadsheetValues(spreadsheetId, spreadsheetData)
 }, {deep: true})

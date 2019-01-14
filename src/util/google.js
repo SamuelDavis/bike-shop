@@ -128,12 +128,16 @@ export function auth(config, listener = noop) {
         })
 }
 
-export function fetchSpreadsheet(spreadsheetId) {
+export function fetchSpreadsheet(spreadsheetId, namespaces = []) {
     return google.spreadsheet
         .fetch(spreadsheetId)
-        .then((spreadsheet) => google.spreadsheet
-            .fetchData(spreadsheetId, spreadsheet.ranges)
-            .then((data) => ({...spreadsheet, data}))
+        .then((spreadsheet) => {
+                const ranges = namespaces.filter((key) => !spreadsheet.ranges.includes(key))
+                return (ranges.length ? google.spreadsheet.persistSheets(spreadsheetId, ranges) : Promise.resolve())
+                    .then(() => google.spreadsheet
+                        .fetchData(spreadsheetId, (namespaces.length ? namespaces : spreadsheet.ranges))
+                        .then((data) => ({...spreadsheet, data})))
+            }
         )
 }
 
