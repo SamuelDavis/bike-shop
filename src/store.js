@@ -17,7 +17,7 @@ function signInListener(store, isAuthed) {
 
 function createSpreadsheet(spreadsheetId = undefined, name = "NCCDB") {
     return (spreadsheetId
-        ? Promise.resolve({spreadsheetId})
+        ? Promise.resolve({result: {spreadsheetId}})
         : google.createSpreadsheet(name))
 }
 
@@ -39,6 +39,7 @@ function storeData(store, spreadsheet, events) {
     const models = Object.keys(spreadsheet.data)
         .filter((key) => key in MODEL_MAP)
         .reduce((acc, key) => [...acc, ...spreadsheet.data[key]
+            .slice(1)
             .map((record) => new MODEL_MAP[key]().fromArray(record))], [])
         .concat(events.map((event) => new Event(event)))
     store.commit(mutations.saveModels.name, models)
@@ -161,10 +162,14 @@ store.watch((state) => state.data, (data) => {
     if (!store.getters.spreadsheetId) return
 
     const spreadsheetId = store.getters.spreadsheetId
-    const spreadsheetData = Object.keys(data).reduce((acc, key) => ({
-        ...acc,
-        [key === Attendance.name ? attendanceNamespace : key]: Object.values(data[key]).map((model) => model.toArray())
-    }), {})
+    const spreadsheetData = Object.keys(data).reduce((acc, key) => {
+        const namespace = key === Attendance.name ? attendanceNamespace : key
+        const header = new MODEL_MAP[namespace]()
+        return ({
+            ...acc,
+            [namespace]: [header.properties].concat(Object.values(data[key]).map((model) => model.toArray()))
+        })
+    }, {})
     google.persistSpreadsheetValues(spreadsheetId, spreadsheetData)
         .then(() => flash.success("Saved."))
 }, {deep: true})
