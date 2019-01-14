@@ -27,7 +27,7 @@ export default {
             return fuzzySearch(this.searchTerm, this.$store.getters.lookup(User.name), ["name", "email", "phone", "address"])
                 .map((user) => {
                     const lastAttendance = this.$store.getters.lastAttendanceFor(user, this.targetEvent)
-                    Vue.set(user, "active", lastAttendance && lastAttendance.signedOut === undefined)
+                    Vue.set(user, "active", lastAttendance && lastAttendance.isActive)
                     return user
                 })
                 .sort((a, b) => !!b.active - !!a.active)
