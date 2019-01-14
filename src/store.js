@@ -7,8 +7,8 @@ import Attendance from "./data/Attendance.js"
 const attendanceNamespace = [
     Attendance.name,
     new Date().getFullYear(),
-    new Date().getMonth() + 1
-].join("-")
+    ("00" + (new Date().getMonth() + 1)).slice(-2)
+].join("_")
 
 function signInListener(store, isAuthed) {
     store.commit(mutations.updateAuth.name, isAuthed)
@@ -26,7 +26,7 @@ function fetchData(store, spreadsheetId, calendarId) {
         spreadsheetId
     })
     return Promise.all([
-        google.fetchSpreadsheet(spreadsheetId, MODELS.map((model) => model === Attendance ? attendanceNamespace : model.name)),
+        google.fetchSpreadsheet(spreadsheetId, Object.keys(MODEL_MAP)),
         calendarId
             ? google.fetchEvents(calendarId)
             : Promise.resolve([])
@@ -38,14 +38,17 @@ function storeData(store, spreadsheet, events) {
     const models = Object.keys(spreadsheet.data)
         .filter((key) => key in MODEL_MAP)
         .reduce((acc, key) => [...acc, ...spreadsheet.data[key]
-            .map((record) => new MODEL_MAP[key === attendanceNamespace ? Attendance.name : key]().fromArray(record))], [])
+            .map((record) => new MODEL_MAP[key]().fromArray(record))], [])
         .concat(events.map((event) => new Event(event)))
     store.commit(mutations.saveModels.name, models)
 }
 
 const MODELS = [Event, User, Attendance]
 
-const MODEL_MAP = MODELS.reduce((acc, Model) => ({...acc, [Model.name]: Model}), {})
+const MODEL_MAP = MODELS.reduce((acc, Model) => ({
+    ...acc,
+    [Model === Attendance ? attendanceNamespace : Model.name]: Model
+}), {})
 
 export const mutations = {
     updateAuth(state, isAuthed) {

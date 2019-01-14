@@ -2,10 +2,10 @@ import * as faker from "../util/faker.js"
 
 export default class Model {
     constructor(data = {}) {
-        this.data = {}
+        Vue.set(this, "data", {})
         this.properties.forEach((prop) => Object.defineProperty(this, prop, {
             get: this[`get_${prop}`] || (() => this.data[prop]),
-            set: this[`set_${prop}`] || ((value) => this.data[prop] = value),
+            set: this[`set_${prop}`] || ((value) => Vue.set(this.data, prop, value)),
             configurable: true
         }))
         for (let prop in data) {

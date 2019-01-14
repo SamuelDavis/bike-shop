@@ -35,16 +35,23 @@ export default {
     },
     methods: {
         toggleAttendance(user) {
-            let record = this.$store.getters.lastAttendanceFor(user, this.targetEvent)
-            if (record && record.signedOut === undefined) {
-                record.signedOut = new Date()
-            } else {
-                record = new Attendance({
+            const fiveMinutes = 300000
+            let record = ((existing) => {
+                if (existing && existing.isActive) {
+                    existing.signedOut = new Date()
+                    return existing
+                }
+                if (existing && (new Date() - existing.signedOut) < fiveMinutes) {
+                    existing.signedOut = undefined
+                    return existing
+                }
+                return new Attendance({
                     userId: user.id,
                     eventId: this.targetEvent.id,
                     signedIn: new Date()
                 })
-            }
+            })(this.$store.getters.lastAttendanceFor(user, this.targetEvent))
+
             this.$store.commit(mutations.saveModels.name, [record])
         }
     }

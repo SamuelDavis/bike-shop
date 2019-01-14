@@ -85,13 +85,12 @@ const google = {
         fetchData(spreadsheetId, ranges) {
             const request = getClient().sheets.spreadsheets.values.batchGet({spreadsheetId, ranges})
             return thenify(request)
-                .then((res) => {
-                    return res.result.valueRanges.reduce((acc, valueRange) => {
-                        const namespace = valueRange.range.split("!")[0]
-                        const records = valueRange.values || []
-                        return {...acc, [namespace]: records}
-                    }, {})
-                })
+                .then((res) => res.result.valueRanges.reduce((acc, valueRange) => {
+                    const namespace = valueRange.range.split("!")[0]
+                    const records = valueRange.values || []
+                    return {...acc, [namespace]: records}
+                }, {}))
+
         },
         persistSheets(spreadsheetId, names) {
             const requests = names.map((name) => ({addSheet: {properties: {title: name}}}))

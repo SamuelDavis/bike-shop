@@ -13,6 +13,6 @@ export default class User extends Model {
     }
 
     set_role(role) {
-        this.data.role = parseInt(role, 10)
+        Vue.set(this.data, "role", parseInt(role, 10))
     }
 }
