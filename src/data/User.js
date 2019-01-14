@@ -1,4 +1,4 @@
-import Model from "../models/Model.js"
+import Model from "./Model.js"
 
 export const ROLES = {
     PARTICIPANT: 0,

@@ -1,7 +1,8 @@
 import * as google from "./util/google.js"
-import Event from "./models/Event.js"
+import Event from "./data/Event.js"
 import User from "./data/User.js"
 import {parseQuery} from "./util/misc.js"
+import Attendance from "./data/Attendance.js"
 
 function signInListener(store, isAuthed) {
     store.commit(mutations.updateAuth.name, isAuthed)
@@ -111,6 +112,12 @@ const getters = {
     },
     calendarId(state) {
         return state.auth.creds.calendarId
+    },
+    lastAttendanceFor(state, getters) {
+        return (user, event) => getters
+            .lookup(Attendance.name)
+            .sort((a, b) => b.signedIn - a.signedIn)
+            .reduce((acc, record) => acc || record.eventId === event.id && record.userId === user.id && record, undefined)
     }
 }
 

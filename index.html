@@ -51,6 +51,16 @@
                     </button>
                 </div>
             </div>
+            <div class="input-group my-2">
+                <input type="search" class="form-control" placeholder="search..." v-model="searchTerm">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="button" @click="searchTerm = ''">&times;</button>
+                </div>
+            </div>
+
+            <div class="card-columns">
+                <user-card v-for="user in users" :key="user.id" :user="user" :onClick="() => toggleAttendance(user)"/>
+            </div>
         </div>
     </div>
 </script>
@@ -92,7 +102,7 @@
     </form>
 </script>
 <script id="event-card-template" type="text/x-template">
-    <div class="card" :style="style" @click="onClick">
+    <div class="card" :style="styles" @click="onClick">
         <div class="card-body">
             <p class="card-title" v-text="event.summary"></p>
             <p v-if="event.description" class="card-text" v-text="event.description"></p>
@@ -113,7 +123,7 @@
     </div>
 </script>
 <script id="user-card-template" type="text/x-template">
-    <div class="card" :style="style" @click="onClick">
+    <div :class="classes" :style="styles" @click="onClick">
         <div class="card-body">
             <p class="card-title" v-text="user.name"></p>
             <p class="card-text" v-if="user.location" v-text="user.address"></p>

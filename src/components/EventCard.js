@@ -1,4 +1,4 @@
-import Event from "../models/Event.js"
+import Event from "../data/Event.js"
 import {noop} from "../util/misc.js"
 
 export default {
@@ -17,7 +17,7 @@ export default {
         clickable() {
             return this.onClick !== noop
         },
-        style() {
+        styles() {
             return {cursor: this.clickable ? "pointer" : undefined}
         }
     }

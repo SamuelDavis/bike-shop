@@ -17,7 +17,12 @@ export default {
         clickable() {
             return this.onClick !== noop
         },
-        style() {
+        classes() {
+            return ["card"].concat(this.user.active
+                ? ["bg-light"]
+                : ["text-light", "bg-secondary"])
+        },
+        styles() {
             return {cursor: this.clickable ? "pointer" : undefined}
         }
     }
