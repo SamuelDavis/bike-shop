@@ -2,17 +2,16 @@ import * as faker from "../util/faker.js"
 
 export default class Model {
     constructor(data = {}) {
-        this.data = data
-
-        Object.defineProperties(this, this.properties.reduce((acc, prop) => ({
-            ...acc, [prop]: {
-                get: () => this.data[prop],
-                set: (val) => this.data[prop] = val,
-                configurable: true
-            }
-        }), {}))
-
-        this.ensureId()
+        this.data = {}
+        this.properties.forEach((prop) => Object.defineProperty(this, prop, {
+            get: this[`get_${prop}`] || (() => this.data[prop]),
+            set: this[`set_${prop}`] || ((value) => this.data[prop] = value),
+            configurable: true
+        }))
+        for (let prop in data) {
+            if (data.hasOwnProperty(prop)) this[prop] = data[prop]
+        }
+        return this.ensureId()
     }
 
     ensureId() {

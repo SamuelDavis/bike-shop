@@ -18,9 +18,7 @@ export default {
     },
     computed: {
         user() {
-            const user = this.$store.state.data[User.name][this.$route.params.id] || new User()
-            console.log({user})
-            return user
+            return this.$store.state.data[User.name][this.$route.params.id] || new User()
         },
         controls() {
             return this.inputs.concat([
