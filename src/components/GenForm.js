@@ -1,6 +1,5 @@
-import {extractForm} from "../util/form.js"
 import FormControl from "./FormControl.js"
-import {noop} from "../util/misc.js"
+import {extractForm, noop} from "../util/misc.js"
 
 export default {
     template: "#gen-form-template",

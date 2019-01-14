@@ -1,7 +1,7 @@
 import * as google from "./util/google.js"
-import {parseQuery} from "./util/str.js"
 import Event from "./models/Event.js"
 import User from "./data/User.js"
+import {parseQuery} from "./util/misc.js"
 
 function signInListener(store, isAuthed) {
     store.commit(mutations.updateAuth.name, isAuthed)

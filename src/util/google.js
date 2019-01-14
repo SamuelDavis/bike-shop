@@ -1,6 +1,4 @@
-import {promisify} from "./promise.js"
-import {proxy} from "./proxy.js"
-import {noop} from "./misc.js"
+import {noop, promisify, proxy} from "./misc.js"
 
 function thenify(request) {
     return promisify(request.then.bind(request))
