@@ -1,5 +1,5 @@
 import EventsPage from "./components/events/EventsPage.js";
-import BarPage from "./components/BarPage.js";
+import PeoplePage from "./components/PeoplePage.js";
 import QuxPage from "./components/QuxPage.js";
 import Route from "./models/Route.js";
 import Anchor from "./models/Anchor.js";
@@ -9,13 +9,14 @@ export const routes = {
     config: new Route("/config", ConfigPage),
     events: new Route("/events", EventsPage).withAlias("/"),
     event: new Route("/event/:eventId"),
-    bar: new Route("/bar", BarPage),
+    people: new Route("/people", PeoplePage),
+    person: new Route("/person/:personId?"),
     qux: new Route("/qux", QuxPage),
 };
 
 Object.keys(routes).forEach((name) => routes[name].name = name);
 
-export const mainNav = [routes.events, routes.bar, routes.qux, routes.config]
+export const mainNav = [routes.events, routes.people, routes.qux, routes.config]
     .map((route) => new Anchor(
         route.toString(),
         route.name.toUpperCase(),

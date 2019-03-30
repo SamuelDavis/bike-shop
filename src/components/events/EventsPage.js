@@ -1,22 +1,22 @@
-import CardList from "../util/CardList.js";
-import Card from "../../models/Card.js";
+import CardDatum from "../../models/Card.js";
 import store, {actions} from "../../store.js";
 import {routes} from "../../router.js";
 import CalendarEvent from "../../models/data/CalendarEvent.js";
 import * as google from "../../util/google.js";
 import Anchor from "../../models/Anchor.js";
+import CardComponent from "../util/Card.js";
 
 export default Vue.extend({
     store,
     template: "#events-page-template",
     components: {
-        "card-list": CardList
+        "card": CardComponent
     },
     computed: {
         cards() {
             return this.$store.getters
                 .data(CalendarEvent.namespace)
-                .map((event) => new Card(event.name, event.location).linksTo(
+                .map((event) => new CardDatum(event.name, event.location).linksTo(
                     routes.event.toString({eventId: event.id})
                 ));
         }

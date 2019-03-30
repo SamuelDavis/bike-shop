@@ -16,7 +16,7 @@ export default class Route {
             .map((chunk) => {
                 const matches = chunk.match(/:([^:\?]+)\??/) || [];
                 const prop = matches.pop() || chunk;
-                return prop in props ? props[prop] : prop;
+                return matches.length ? props[prop] : prop;
             })
             .join("/");
     }

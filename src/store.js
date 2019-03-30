@@ -1,6 +1,7 @@
 import CalendarEvent from "./models/data/CalendarEvent.js";
+import Person from "./models/data/Person.js";
 
-const DATA_MAP = [CalendarEvent].reduce((acc, dat) => ({...acc, [dat.namespace]: dat}), {});
+const DATA_MAP = [CalendarEvent, Person].reduce((acc, dat) => ({...acc, [dat.namespace]: dat}), {});
 const state = {
     data: Object.keys(DATA_MAP).reduce((acc, namespace) => ({...acc, [namespace]: {}}), {}),
     appNamespace: "NCCDB",
@@ -15,6 +16,17 @@ state.config = {
     ...state.config,
     ...JSON.parse(localStorage.getItem(state.appNamespace) || "{}")
 };
+new Array(7).fill(undefined).forEach((_, i) => {
+    const datum = new Person({
+        id: Person.namespace + Math.random().toString(10).slice(3),
+        createdAt: new Date(),
+        updatedAt: new Date(),
+        name: `Person ${i}`,
+        address: `Address ${i}`,
+        phone: `Phone ${i}`
+    });
+    state.data[Person.namespace][datum.id] = datum;
+});
 
 export const mutations = {
     putConfig(state, config) {

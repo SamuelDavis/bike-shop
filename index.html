@@ -18,16 +18,14 @@
 <script src="index.js" type="module"></script>
 <script id="app-template" type="text/x-template">
     <v-app>
-        <v-toolbar flat>
-            <v-toolbar-title v-text="appTitle"></v-toolbar-title>
-        </v-toolbar>
         <v-content>
-            <v-container>
-                <navbar :routes="mainNav"></navbar>
-                <keep-alive>
-                    <router-view></router-view>
-                </keep-alive>
-            </v-container>
+            <v-toolbar flat>
+                <v-toolbar-title v-text="appTitle"></v-toolbar-title>
+            </v-toolbar>
+            <keep-alive>
+                <router-view></router-view>
+            </keep-alive>
+            <navbar :routes="mainNav"></navbar>
         </v-content>
     </v-app>
 </script>
@@ -54,7 +52,7 @@
 </script>
 <script id="card-list-template" type="text/x-template">
     <v-layout row wrap>
-        <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm6 md3 lg2 xl1>
+        <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
             <card v-bind="card"></card>
         </v-flex>
     </v-layout>
@@ -69,19 +67,36 @@
     </v-card>
 </script>
 <script id="events-page-template" type="text/x-template">
-    <div>
-        <v-btn fab absolute top left>
-            <v-icon @click.prevent="fetchEvents">refresh</v-icon>
-        </v-btn>
-        <h1>Events List</h1>
-        <card-list v-if="authed" :cards="cards"></card-list>
-        <p v-else class="text-sm-center">
-            <v-btn :to="configLink.href" v-text="configLink.text"></v-btn>
-        </p>
-    </div>
+    <v-container>
+        <h1>
+            <v-btn fab>
+                <v-icon @click.prevent="fetchEvents">refresh</v-icon>
+            </v-btn>
+            <span>Events List</span>
+            <v-spacer></v-spacer>
+            <v-btn v-if="!authed" :to="configLink.href" v-text="configLink.text"></v-btn>
+        </h1>
+        <v-layout v-if="authed" row wrap>
+            <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
+                <card v-bind="card"></card>
+            </v-flex>
+        </v-layout>
+    </v-container>
 </script>
-<script id="bar-page-template" type="text/x-template">
-    <h1>Bar</h1>
+<script id="people-page-template" type="text/x-template">
+    <v-container>
+        <h1>
+            <v-btn fab :to="newHref">
+                <v-icon>add</v-icon>
+            </v-btn>
+            <span>People</span>
+        </h1>
+        <v-layout row wrap>
+            <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
+                <card v-bind="card"></card>
+            </v-flex>
+        </v-layout>
+    </v-container>
 </script>
 <script id="qux-page-template" type="text/x-template">
     <h1>Qux</h1>
