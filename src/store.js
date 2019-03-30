@@ -23,6 +23,25 @@ new Array(3).fill(undefined).forEach((_, i) => {
     });
     state.data[Person.namespace][datum.id] = datum;
 });
+[{
+    "id": "18etonq71t4bnvlfe1fi8likrd_20190331T020000Z",
+    "createdAt": "2019-01-11T04:15:23.000Z",
+    "updatedAt": "2019-03-30T21:11:18.903Z",
+    "startsAt": "2019-03-31T02:00:00.000Z",
+    "endsAt": "2019-03-31T04:00:00.000Z",
+    "location": "Neighborhood Care Center, 19711 Smith Cir, Cornelius, NC 28031, USA",
+    "name": "Bike Shop (Weekend)",
+    "description": "Weekend Bike Shop classes."
+}, {
+    "id": "3emdslj8p8ie9daqhep9jnj250_20190401T200000Z",
+    "createdAt": "2019-01-11T03:58:13.000Z",
+    "updatedAt": "2019-03-30T21:11:18.904Z",
+    "startsAt": "2019-04-01T20:00:00.000Z",
+    "endsAt": "2019-04-01T22:30:00.000Z",
+    "location": "Neighborhood Care Center, 19711 Smith Cir, Cornelius, NC 28031, USA",
+    "name": "Learning Zone",
+    "description": "Weekday Learning Zone classes."
+}].map((event) => state.data[CalendarEvent.namespace][event.id] = event);
 
 export const mutations = {
     putConfig(state, config) {
