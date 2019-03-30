@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <link href="data:image/x-icon;," rel="shortcut icon" type="image/x-icon">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:100,300,400,500,700,900|Material+Icons" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/vuetify/dist/vuetify.min.css" rel="stylesheet">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui" name="viewport">
+</head>
+<body>
+<div id="app"></div>
+<script src="https://unpkg.com/moment"></script>
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<script src="https://unpkg.com/vuex/dist/vuex.js"></script>
+<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
+<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
+<script src="https://apis.google.com/js/api.js">
+</script>
+<script src="index.js" type="module"></script>
+<script id="app-template" type="text/x-template">
+    <v-app>
+        <v-toolbar flat>
+            <v-toolbar-title v-text="appTitle"></v-toolbar-title>
+        </v-toolbar>
+        <v-content>
+            <v-container>
+                <navbar :routes="mainNav"></navbar>
+                <keep-alive>
+                    <router-view></router-view>
+                </keep-alive>
+            </v-container>
+        </v-content>
+    </v-app>
+</script>
+<script id="config-page-template" type="text/x-template">
+    <v-form ref="form" @submit.prevent="handleSubmit">
+        <h1>Application Config</h1>
+        <fieldset class="pa-2">
+            <legend class="headline">Google</legend>
+            <v-text-field name="googleApiKey" label="Api Key" v-model="config.googleApiKey"></v-text-field>
+            <v-text-field name="googleClientId" label="Client Id" v-model="config.googleClientId"></v-text-field>
+            <v-text-field name="googleCalendarId" label="Calendar Id"
+                          v-model="config.googleCalendarId"></v-text-field>
+        </fieldset>
+        <v-btn type="submit" color="success">Save</v-btn>
+    </v-form>
+</script>
+<script id="navbar-template" type="text/x-template">
+    <v-bottom-nav :active.sync="active" :value="true" absolute color="transparent" :mandatory="true">
+        <v-btn v-for="item in items" :key="item.name" flat :value="item.name" :to="item.href">
+            <span v-text="item.text"></span>
+            <v-icon v-text="item.icon"></v-icon>
+        </v-btn>
+    </v-bottom-nav>
+</script>
+<script id="card-list-template" type="text/x-template">
+    <v-layout row wrap>
+        <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm6 md3 lg2 xl1>
+            <card v-bind="card"></card>
+        </v-flex>
+    </v-layout>
+
+</script>
+<script id="card-template" type="text/x-template">
+    <v-card :to="href">
+        <v-card-title v-if="title" primary-title class="text-sm-center">
+            <h3 class="headline mb-0" v-text="title"></h3>
+        </v-card-title>
+        <v-card-text v-if="text" v-text="text"></v-card-text>
+    </v-card>
+</script>
+<script id="events-page-template" type="text/x-template">
+    <div>
+        <v-btn fab absolute top left>
+            <v-icon @click.prevent="fetchEvents">refresh</v-icon>
+        </v-btn>
+        <h1>Events List</h1>
+        <card-list v-if="authed" :cards="cards"></card-list>
+        <p v-else class="text-sm-center">
+            <v-btn :to="configLink.href" v-text="configLink.text"></v-btn>
+        </p>
+    </div>
+</script>
+<script id="bar-page-template" type="text/x-template">
+    <h1>Bar</h1>
+</script>
+<script id="qux-page-template" type="text/x-template">
+    <h1>Qux</h1>
+</script>
+</body>
+</html>
