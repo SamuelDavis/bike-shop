@@ -100,7 +100,12 @@
 <script id="edit-person-page" type="text/x-template">
     <v-container>
         <h1>Edit Person</h1>
-        <pre v-text="$data"></pre>
+        <v-form @submit.prevent="handleSubmit" ref="form">
+            <v-text-field label="Name" name="name" :value="person.name"></v-text-field>
+            <v-text-field label="Address" name="address" :value="person.address"></v-text-field>
+            <v-text-field label="Phone" mask="phone" name="phone" :value="person.phone"></v-text-field>
+            <v-btn type="submit" color="success">Save</v-btn>
+        </v-form>
     </v-container>
 </script>
 </body>

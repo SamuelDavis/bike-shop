@@ -19,7 +19,7 @@ new Array(3).fill(undefined).forEach((_, i) => {
         updatedAt: new Date(),
         name: `Person ${i}`,
         address: `Address ${i}`,
-        phone: `Phone ${i}`
+        phone: `${i}1231231234`
     });
     state.data[Person.namespace][datum.id] = datum;
 });
