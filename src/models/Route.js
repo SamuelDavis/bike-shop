@@ -3,6 +3,7 @@ export default class Route {
         this.path = path;
         this.component = component;
         this.alias = undefined;
+        this.props = true;
     }
 
     withAlias(alias) {

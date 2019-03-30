@@ -12,9 +12,9 @@ const state = {
     ...JSON.parse(localStorage.getItem(appNamespace) || "{}")
 
 };
-new Array(7).fill(undefined).forEach((_, i) => {
+new Array(3).fill(undefined).forEach((_, i) => {
     const datum = new Person({
-        id: Person.namespace + Math.random().toString(10).slice(3),
+        id: Person.namespace + i,
         createdAt: new Date(),
         updatedAt: new Date(),
         name: `Person ${i}`,
@@ -33,7 +33,6 @@ export const mutations = {
         datum.id = datum.id || Math.random().toString(10).slice(2);
         datum.createdAt = datum.createdAt || new Date().toJSON();
         datum.updatedAt = new Date().toJSON();
-
         Vue.set(state.data[datum.namespace], datum.id, datum);
     },
 };

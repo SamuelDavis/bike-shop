@@ -4,13 +4,14 @@ import QuxPage from "./components/QuxPage.js";
 import Route from "./models/Route.js";
 import Anchor from "./models/Anchor.js";
 import ConfigPage from "./components/ConfigPage.js";
+import EditPersonPage from "./components/EditPersonPage.js";
 
 export const routes = {
     config: new Route("/config", ConfigPage),
     events: new Route("/events", EventsPage).withAlias("/"),
     event: new Route("/event/:eventId"),
     people: new Route("/people", PeoplePage),
-    person: new Route("/person/:personId?"),
+    person: new Route("/person/:personId?", EditPersonPage),
     qux: new Route("/qux", QuxPage),
 };
 

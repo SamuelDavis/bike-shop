@@ -38,17 +38,19 @@ export default Vue.extend({
                     timeMin: moment().startOf("day").toISOString(),
                     timeMax: moment().endOf("day").add(2, "days").toISOString()
                 }))
-                .then((events) => events.forEach((event) => {
-                    const model = new CalendarEvent({
-                        ...event,
-                        name: event.summary,
-                        startsAt: event.start,
-                        endsAt: event.end,
-                        updatedAt: event.updated,
-                        createdAt: event.created
+                .then((events) => {
+                    return events.forEach((event) => {
+                        const model = new CalendarEvent({
+                            ...event,
+                            name: event.summary,
+                            startsAt: event.start,
+                            endsAt: event.end,
+                            updatedAt: event.updated,
+                            createdAt: event.created
+                        });
+                        this.$store.dispatch(actions.putDatum.name, model);
                     });
-                    this.$store.dispatch(actions.putDatum.name, model);
-                }));
+                });
         }
     }
 });

@@ -22,9 +22,7 @@
             <v-toolbar flat>
                 <v-toolbar-title v-text="appTitle"></v-toolbar-title>
             </v-toolbar>
-            <keep-alive>
-                <router-view></router-view>
-            </keep-alive>
+            <router-view></router-view>
             <navbar :routes="mainNav"></navbar>
         </v-content>
     </v-app>
@@ -73,10 +71,8 @@
                 <v-icon @click.prevent="fetchEvents">refresh</v-icon>
             </v-btn>
             <span>Events List</span>
-            <v-spacer></v-spacer>
-            <v-btn v-if="!authed" :to="configLink.href" v-text="configLink.text"></v-btn>
         </h1>
-        <v-layout v-if="authed" row wrap>
+        <v-layout v-if="cards.length" row wrap>
             <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
                 <card v-bind="card"></card>
             </v-flex>
@@ -100,6 +96,12 @@
 </script>
 <script id="qux-page-template" type="text/x-template">
     <h1>Qux</h1>
+</script>
+<script id="edit-person-page" type="text/x-template">
+    <v-container>
+        <h1>Edit Person</h1>
+        <pre v-text="$data"></pre>
+    </v-container>
 </script>
 </body>
 </html>
