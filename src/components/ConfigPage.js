@@ -5,7 +5,7 @@ export default Vue.extend({
     store,
     template: "#config-page-template",
     computed: {
-        ...Vuex.mapGetters(["config"])
+        ...Vuex.mapGetters(["googleConfig"])
     },
     methods: {
         handleSubmit(e) {

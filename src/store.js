@@ -2,19 +2,15 @@ import CalendarEvent from "./models/data/CalendarEvent.js";
 import Person from "./models/data/Person.js";
 
 const DATA_MAP = [CalendarEvent, Person].reduce((acc, dat) => ({...acc, [dat.namespace]: dat}), {});
+const appNamespace = "NCCDB";
 const state = {
     data: Object.keys(DATA_MAP).reduce((acc, namespace) => ({...acc, [namespace]: {}}), {}),
-    appNamespace: "NCCDB",
-    config: {
-        googleApiKey: undefined,
-        googleClientId: undefined,
-        googleCalendarId: undefined,
-    }
+    appNamespace,
+    googleApiKey: undefined,
+    googleClientId: undefined,
+    googleCalendarId: undefined,
+    ...JSON.parse(localStorage.getItem(appNamespace) || "{}")
 
-};
-state.config = {
-    ...state.config,
-    ...JSON.parse(localStorage.getItem(state.appNamespace) || "{}")
 };
 new Array(7).fill(undefined).forEach((_, i) => {
     const datum = new Person({
@@ -31,7 +27,7 @@ new Array(7).fill(undefined).forEach((_, i) => {
 export const mutations = {
     putConfig(state, config) {
         localStorage.setItem(state.appNamespace, JSON.stringify(config));
-        state.config = config;
+        for (let prop in config) state[prop] = config[prop];
     },
     putDatum(state, datum) {
         datum.id = datum.id || Math.random().toString(10).slice(2);
@@ -58,16 +54,13 @@ export const getters = {
             return state.data[namespace][id];
         };
     },
-    config(state) {
-        return state.config;
-    },
     googleConfig(state) {
         return {
             discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/calendar/v3/rest"],
             scope: ["https://www.googleapis.com/auth/calendar.readonly"].join(" "),
-            apiKey: state.config.googleApiKey,
-            clientId: state.config.googleClientId,
-            calendarId: state.config.googleCalendarId,
+            apiKey: state.googleApiKey,
+            clientId: state.googleClientId,
+            calendarId: state.googleCalendarId,
         };
     },
 };

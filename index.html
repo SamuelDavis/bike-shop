@@ -34,10 +34,10 @@
         <h1>Application Config</h1>
         <fieldset class="pa-2">
             <legend class="headline">Google</legend>
-            <v-text-field name="googleApiKey" label="Api Key" v-model="config.googleApiKey"></v-text-field>
-            <v-text-field name="googleClientId" label="Client Id" v-model="config.googleClientId"></v-text-field>
+            <v-text-field name="googleApiKey" label="Api Key" :value="googleConfig.apiKey"></v-text-field>
+            <v-text-field name="googleClientId" label="Client Id" :value="googleConfig.clientId"></v-text-field>
             <v-text-field name="googleCalendarId" label="Calendar Id"
-                          v-model="config.googleCalendarId"></v-text-field>
+                          :value="googleConfig.calendarId"></v-text-field>
         </fieldset>
         <v-btn type="submit" color="success">Save</v-btn>
     </v-form>
