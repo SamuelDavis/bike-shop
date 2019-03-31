@@ -7,6 +7,7 @@
  */
 export default class Datum {
     constructor(props = {}) {
+        this.namespace = this.constructor.namespace;
         if (props instanceof Array)
             this.properties.forEach((prop, i) => this[prop] = props[i]);
         else
@@ -23,10 +24,6 @@ export default class Datum {
 
     get properties() {
         return this.constructor.properties;
-    }
-
-    get namespace() {
-        return this.constructor.namespace;
     }
 
     get array() {

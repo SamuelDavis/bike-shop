@@ -13,5 +13,9 @@ export default Vue.extend({
             type: String,
             required: false
         },
+        clickHandler: {
+            type: Function,
+            required: false
+        }
     }
 });

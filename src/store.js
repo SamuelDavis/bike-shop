@@ -1,7 +1,8 @@
 import CalendarEvent from "./models/data/CalendarEvent.js";
 import Person from "./models/data/Person.js";
+import Attendance from "./models/data/Attendance.js";
 
-const DATA_MAP = [CalendarEvent, Person].reduce((acc, dat) => ({...acc, [dat.namespace]: dat}), {});
+const DATA_MAP = [CalendarEvent, Person, Attendance].reduce((acc, dat) => ({...acc, [dat.namespace]: dat}), {});
 const appNamespace = "NCCDB";
 const state = {
     data: Object.keys(DATA_MAP).reduce((acc, namespace) => ({...acc, [namespace]: {}}), {}),
@@ -41,7 +42,7 @@ new Array(3).fill(undefined).forEach((_, i) => {
     "location": "Neighborhood Care Center, 19711 Smith Cir, Cornelius, NC 28031, USA",
     "name": "Learning Zone",
     "description": "Weekday Learning Zone classes."
-}].map((event) => state.data[CalendarEvent.namespace][event.id] = event);
+}].map((event) => state.data[CalendarEvent.namespace][event.id] = new CalendarEvent(event));
 
 export const mutations = {
     putConfig(state, config) {
@@ -81,6 +82,19 @@ export const getters = {
             calendarId: state.googleCalendarId,
         };
     },
+    lastAttendanceFor(state, getters) {
+        return (event, person) => {
+            return getters.data(Attendance.name)
+                .sort((a, b) => a.signedInAt - b.signedInAt)
+                .reduce((acc, record) => ({
+                    ...acc,
+                    [record.eventId]: {
+                        ...(acc[record.eventId] || {}),
+                        [record.personId]: record
+                    }
+                }), {[event.id]: {}})[event.id][person.id];
+        };
+    }
 };
 
 export default new Vuex.Store({state, mutations, actions, getters});

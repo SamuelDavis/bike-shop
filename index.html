@@ -57,7 +57,7 @@
 
 </script>
 <script id="card-template" type="text/x-template">
-    <v-card :to="href">
+    <v-card :to="href" @click.prevent="clickHandler">
         <v-card-title v-if="title" primary-title class="text-sm-center">
             <h3 class="headline mb-0" v-text="title"></h3>
         </v-card-title>
@@ -118,9 +118,14 @@
                 <pre v-text="$data" class="pa-3"></pre>
             </v-expansion-panel-content>
         </v-expansion-panel>
-        <v-layout v-if="cards.length" row wrap>
-            <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
-                <card v-bind="card"></card>
+        <v-layout v-if="btns.length" row wrap>
+            <v-flex v-for="btn in btns" :key="btn.id" xs12 sm4 md3 lg2 class="ma-1">
+                <v-card @click.prevent="btn.onClick" :dark="!btn.active" style="cursor: pointer;">
+                    <v-card-title>
+                        <h3 v-text="btn.text"></h3>
+                    </v-card-title>
+                    <v-card-text v-text="btn.text"></v-card-text>
+                </v-card>
             </v-flex>
         </v-layout>
     </v-container>
