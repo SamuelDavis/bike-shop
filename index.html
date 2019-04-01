@@ -28,17 +28,19 @@
     </v-app>
 </script>
 <script id="config-page-template" type="text/x-template">
-    <v-form ref="form" @submit.prevent="handleSubmit">
-        <h1>Application Config</h1>
-        <fieldset class="pa-2">
-            <legend class="headline">Google</legend>
-            <v-text-field name="googleApiKey" label="Api Key" :value="googleConfig.apiKey"></v-text-field>
-            <v-text-field name="googleClientId" label="Client Id" :value="googleConfig.clientId"></v-text-field>
-            <v-text-field name="googleCalendarId" label="Calendar Id"
-                          :value="googleConfig.calendarId"></v-text-field>
-        </fieldset>
-        <v-btn type="submit" color="success">Save</v-btn>
-    </v-form>
+    <v-container>
+        <v-form ref="form" @submit.prevent="handleSubmit">
+            <h1>Application Config</h1>
+            <fieldset class="pa-2">
+                <legend class="headline">Google</legend>
+                <v-text-field name="googleApiKey" label="Api Key" :value="googleConfig.apiKey"></v-text-field>
+                <v-text-field name="googleClientId" label="Client Id" :value="googleConfig.clientId"></v-text-field>
+                <v-text-field name="googleCalendarId" label="Calendar Id"
+                              :value="googleConfig.calendarId"></v-text-field>
+            </fieldset>
+            <v-btn type="submit" color="success">Save</v-btn>
+        </v-form>
+    </v-container>
 </script>
 <script id="navbar-template" type="text/x-template">
     <v-bottom-nav :active.sync="active" :value="true" absolute color="transparent" :mandatory="true">
