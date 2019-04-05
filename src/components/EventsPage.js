@@ -1,4 +1,4 @@
-import CardDatum from "../models/Card.js";
+import Card from "../models/Card.js";
 import store, {actions} from "../store.js";
 import {routes} from "../router.js";
 import CalendarEvent from "../models/data/CalendarEvent.js";
@@ -16,9 +16,8 @@ export default Vue.extend({
         cards() {
             return this.$store.getters
                 .data(CalendarEvent.namespace)
-                .map((event) => new CardDatum(event.name, event.location).linksTo(
-                    routes.event.toString({eventId: event.id})
-                ));
+                .map((event) => new Card(event.name, event.location)
+                    .linksTo(routes.event.toString({eventId: event.id})));
         }
     },
     data() {

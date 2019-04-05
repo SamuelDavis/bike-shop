@@ -1,6 +1,6 @@
 import store from "../store.js";
 import Person from "../models/data/Person.js";
-import CardDatum from "../models/Card.js";
+import Card from "../models/Card.js";
 import {routes} from "../router.js";
 import CardComponent from "./util/Card.js";
 
@@ -19,7 +19,7 @@ export default Vue.extend({
         cards() {
             return this.$store.getters
                 .data(Person.namespace)
-                .map((person) => new CardDatum(person.name, person.address).linksTo(
+                .map((person) => new Card(person.name, person.address).linksTo(
                     routes.person.toString({personId: person.id})
                 ));
         }

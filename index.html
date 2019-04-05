@@ -8,13 +8,13 @@
 </head>
 <body>
 <div id="app"></div>
-<script src="https://unpkg.com/moment"></script>
-<script src="https://unpkg.com/vue/dist/vue.js"></script>
-<script src="https://unpkg.com/vuex/dist/vuex.js"></script>
-<script src="https://unpkg.com/vue-router/dist/vue-router.js"></script>
-<script src="https://unpkg.com/vuetify/dist/vuetify.js"></script>
-<script src="https://apis.google.com/js/api.js">
-</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vuex/3.1.0/vuex.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vue-router/3.0.2/vue-router.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/vuetify/1.5.9/vuetify.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.24.0/moment.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.min.js"></script>
+<script src="https://apis.google.com/js/api.js"></script>
 <script src="index.js" type="module"></script>
 <script id="app-template" type="text/x-template">
     <v-app>
@@ -33,10 +33,9 @@
             <h1>Application Config</h1>
             <fieldset class="pa-2">
                 <legend class="headline">Google</legend>
-                <v-text-field name="googleApiKey" label="Api Key" :value="googleConfig.apiKey"></v-text-field>
-                <v-text-field name="googleClientId" label="Client Id" :value="googleConfig.clientId"></v-text-field>
-                <v-text-field name="googleCalendarId" label="Calendar Id"
-                              :value="googleConfig.calendarId"></v-text-field>
+                <v-text-field name="google.apiKey" label="Api Key" :value="google.apiKey"></v-text-field>
+                <v-text-field name="google.clientId" label="Client Id" :value="google.clientId"></v-text-field>
+                <v-text-field name="google.calendarId" label="Calendar Id" :value="google.calendarId"></v-text-field>
             </fieldset>
             <v-btn type="submit" color="success">Save</v-btn>
         </v-form>
