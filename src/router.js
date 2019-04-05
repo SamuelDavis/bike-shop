@@ -1,4 +1,4 @@
-import EventsPage from "./components/events/EventsPage.js";
+import EventsPage from "./components/EventsPage.js";
 import PeoplePage from "./components/PeoplePage.js";
 import Route from "./models/Route.js";
 import Anchor from "./models/Anchor.js";

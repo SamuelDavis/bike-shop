@@ -1,10 +1,10 @@
-import CardDatum from "../../models/Card.js";
-import store, {actions} from "../../store.js";
-import {routes} from "../../router.js";
-import CalendarEvent from "../../models/data/CalendarEvent.js";
-import * as google from "../../util/google.js";
-import Anchor from "../../models/Anchor.js";
-import CardComponent from "../util/Card.js";
+import CardDatum from "../models/Card.js";
+import store, {actions} from "../store.js";
+import {routes} from "../router.js";
+import CalendarEvent from "../models/data/CalendarEvent.js";
+import * as google from "../util/google.js";
+import Anchor from "../models/Anchor.js";
+import CardComponent from "./util/Card.js";
 
 export default Vue.extend({
     store,
