@@ -6,7 +6,7 @@ import Attendance from "../models/data/Attendance.js";
 
 export default Vue.extend({
     store,
-    template: "#attendance-page-template",
+    template: "#event-page-template",
     components: {
         "card": CardComponent
     },
