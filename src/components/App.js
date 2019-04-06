@@ -11,7 +11,7 @@ export default Vue.extend({
     },
     data() {
         return {
-            appTitle: this.$store.getters.appNamespace,
+            appTitle: this.$store.getters.appNamespace + " - " + this.$router.currentRoute.name.split(/(?=[A-Z])/).join(" ").toUpperCase(),
             mainNav,
         };
     }

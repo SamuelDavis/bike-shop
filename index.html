@@ -58,26 +58,28 @@
 
 </script>
 <script id="card-template" type="text/x-template">
-    <v-card :to="href" @click.prevent="clickHandler">
-        <v-card-title v-if="title" primary-title class="text-sm-center">
-            <h3 class="headline mb-0" v-text="title"></h3>
-        </v-card-title>
-        <v-card-text v-if="text" v-text="text"></v-card-text>
-    </v-card>
 </script>
 <script id="events-page-template" type="text/x-template">
     <v-container>
-        <h1>
-            <v-btn fab>
-                <v-icon @click.prevent="fetchEvents">refresh</v-icon>
-            </v-btn>
-            <span>Events List</span>
-        </h1>
-        <v-layout v-if="cards.length" row wrap>
-            <v-flex v-for="card in cards" class="ma-1" :key="card.name" xs12 sm4 md3 lg2>
-                <card v-bind="card"></card>
-            </v-flex>
-        </v-layout>
+        <div v-if="events.length">
+            <v-subheader>Click an event below to sign in.</v-subheader>
+            <v-layout row wrap>
+                <v-flex v-for="event in events" class="ma-1" :key="event.name" xs12 sm4 md3 lg2>
+                    <v-card :to="event.href">
+                        <v-card-title primary-title class="text-sm-center">
+                            <h3 class="headline mb-0" v-text="event.name"></h3>
+                        </v-card-title>
+                        <v-card-text v-text="event.location"></v-card-text>
+                        <v-card-text v-text="event.timestamp"></v-card-text>
+                    </v-card>
+                </v-flex>
+            </v-layout>
+        </div>
+        <h3 v-else>
+            There don't seem to be any events available right now. You can click
+            <v-btn @click.prevent="fetchEvents">here</v-btn>
+            to try and fetch some.
+        </h3>
     </v-container>
 </script>
 <script id="people-page-template" type="text/x-template">
@@ -111,12 +113,18 @@
 </script>
 <script id="event-page-template" type="text/x-template">
     <v-container>
+        <v-subheader>Click a name below to sign that person in or out.</v-subheader>
         <v-expansion-panel class="mb-2">
             <v-expansion-panel-content>
                 <template v-slot:header>
                     <h1 v-text="event.name"></h1>
                 </template>
-                <pre v-text="$data" class="pa-3"></pre>
+                <v-list dense>
+                    <v-list-tile v-for="value, prop in event" :key="prop">
+                        <v-list-tile-content>{{ prop }}:</v-list-tile-content>
+                        <v-list-tile-content class="align-end">{{ value }}</v-list-tile-content>
+                    </v-list-tile>
+                </v-list>
             </v-expansion-panel-content>
         </v-expansion-panel>
         <v-layout v-if="btns.length" row wrap>
